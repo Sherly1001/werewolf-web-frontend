@@ -1,4 +1,4 @@
-# werewolf-web-frontend
+# werewolf
 
 ## Project setup
 ```
