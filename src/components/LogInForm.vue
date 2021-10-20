@@ -1,6 +1,6 @@
 <template>
   <div class="login-form">
-    <form action="/" method="">
+    <form action="" method="POST">
       <h1>Welcome Back!!</h1>
       <h4>We're so excited to see you again!</h4>
       <label for="username">User Name</label>
@@ -23,7 +23,7 @@ export default {};
 <style scoped>
 input {
   background-color: #3a3b3c;
-  height: 3rem;
+  height: 3.5rem;
   outline: none;
   display: block;
   padding: 10px 6px;
@@ -32,6 +32,7 @@ input {
   border: none;
   color: white;
   border-radius: 6px;
+  font-size: 1.5rem;
 }
 form {
   display: flex;
