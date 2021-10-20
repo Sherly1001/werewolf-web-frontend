@@ -73,7 +73,7 @@ export default {};
   left: 0;
   display: flex;
   flex-direction: column;
-  width: 15rem;
+  min-width: 15rem;
   background: #2f3136;
   color: #8e9297;
   text-align: center;
@@ -94,7 +94,7 @@ export default {};
   cursor: pointer;
 }
 .category {
-  padding: 24px 10px 0 16px;
+  padding: 15px 10px 0 16px;
   display: flex;
   flex-direction: column;
 }
@@ -105,7 +105,7 @@ export default {};
   cursor: pointer;
   background: transparent;
   border: none;
-  color: #718096;
+  color: #8E9297;
   width: 100%;
   text-transform: lowercase;
 }
@@ -132,7 +132,7 @@ export default {};
 }
 .category-list:hover {
   color: white;
-  background: #393d42;
+  background: #4f545c;
 }
 .hashtag {
   margin-right: 6px;
@@ -142,6 +142,6 @@ export default {};
 }
 .active {
   color: white;
-  background: #393d42;
+  background: #4f545c;
 }
 </style>
