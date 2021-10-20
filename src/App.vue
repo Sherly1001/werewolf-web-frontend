@@ -1,13 +1,20 @@
 <template>
   <div class="container">
-    <MainSite />
+    <MainSite v-if="login"/>
+    <LogInSite />
   </div>
 </template>
 <script>
 import MainSite from "./views/MainSite.vue";
+import LogInSite from "./views/LogInSite.vue"
 export default {
   components:{
-    MainSite,
+    MainSite, LogInSite
+  },
+  data(){
+    return{
+      login: false
+    }
   },
   setup() {
     
