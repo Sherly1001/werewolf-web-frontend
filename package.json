@@ -16,8 +16,6 @@
     "dotenv": "^10.0.0",
     "random-animals-api": "^1.2.6",
     "vue": "^3.0.0",
-    "vue-3-socket.io": "^1.0.4",
-    "vue-axios-cors": "^1.0.1",
     "vue-router": "^4.0.0-0",
     "vue3-cookies": "^1.0.6"
   },
