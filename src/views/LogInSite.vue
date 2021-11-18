@@ -1,11 +1,16 @@
 <template>
   <div class="login-site">
-    <router-view />
+    <LogInForm />
   </div>
 </template>
 
 <script>
-export default {};
+import LogInForm from "../components/LogInForm.vue";
+export default {
+  components: {
+    LogInForm,
+  },
+};
 </script>
 
 <style>
