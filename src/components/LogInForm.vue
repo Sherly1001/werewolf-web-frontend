@@ -47,7 +47,7 @@ export default {
         .then((token) => {
           if (token) {
             this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-            window.location.assign("/home");
+            window.location.assign("/");
             console.log("oke");
           }
         })
