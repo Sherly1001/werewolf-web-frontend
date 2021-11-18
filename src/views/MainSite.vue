@@ -17,6 +17,7 @@ export default {
 
 <style>
 .main-site {
+    position: relative;
     display: flex;
     justify-content: flex-start;
     flex: 1 1 auto;

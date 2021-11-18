@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <MainSite v-if="login"/>
-    <LogInSite />
+    <LogInSite v-else/>
   </div>
 </template>
 <script>
@@ -33,5 +33,10 @@ body{
 #app{
   height: 100%;
   width: 100%;
+}
+.required:after {
+    content: " *";
+    color: rgb(255, 255, 255);
+    font-weight: bold;
 }
 </style>
