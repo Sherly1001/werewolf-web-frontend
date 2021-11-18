@@ -85,7 +85,7 @@ export default {};
   color: white;
   font-weight: bold;
   justify-content: space-between;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #232527;
 }
 .title button {
   background: #2f3136;

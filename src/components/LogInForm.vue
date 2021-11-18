@@ -1,23 +1,62 @@
 <template>
   <div class="login-form">
-    <form action="" method="POST">
+    <form v-on:submit.prevent>
       <h1>Welcome Back!!</h1>
       <h4>We're so excited to see you again!</h4>
-      <label for="username">User Name</label>
-      <input type="text" name="username" id="username" />
-      <label for="passwd">Password</label>
-      <input type="password" name="passwd" id="passwd" />
+      <label for="username" class="required">User Name</label>
+      <input
+        type="text"
+        name="user[username]"
+        id="username"
+        v-model="username"
+        required
+      />
+      <label for="passwd" class="required">Password</label>
+      <input
+        type="password"
+        name="user[passwd]"
+        id="passwd"
+        v-model="passwd"
+        required
+      />
       <div class="button-group">
-        <button class="login-btn">Login</button>
+        <button type="button" class="login-btn" @click="authorize">
+          Login
+        </button>
         <div class="separator">OR</div>
-        <button class="signup-btn">Sign Up</button>
+        <router-link :to="{ name: 'SignUp' }">
+          <button type="button" class="signup-btn">Sign Up</button>
+        </router-link>
       </div>
     </form>
   </div>
 </template>
-
 <script>
-export default {};
+import user from "../services/user.js";
+export default {
+  data() {
+    return {
+      username: "",
+      passwd: "",
+    };
+  },
+  methods: {
+    authorize() {
+      user
+        .login(this.username, this.passwd)
+        .then((token) => {
+          if (token) {
+            this.$cookies.set("token", token, 60 * 60 * 24 * 5);
+            window.location.assign("/");
+            console.log("oke");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -63,10 +102,16 @@ button {
   font-size: 1.5rem;
   border-radius: 6px;
 }
-h1,
-h4 {
+h1{
   color: white;
   margin: 0;
+}
+h4{
+  color: #aaa;
+  margin: 0;
+}
+.login-form {
+  background-color: #242526;
 }
 .button-group {
   padding-top: 3rem;
