@@ -43,5 +43,11 @@ async function signup(username, passwd, url) {
       }
     });
 }
+async function getRandomCat() {
+  return await fetch("https://aws.random.cat/meow").then(res => res.json());
+}
+async function getRandomDog() {
+  return await fetch("https://dog.ceo/api/breeds/image/random").then(res => res.json());
+}
 
-export default { login, signup };
+export default { login, signup , getRandomCat , getRandomDog};

@@ -43,8 +43,7 @@ export default {
   methods: {
     signup() {
       if (Math.random() < 0.5) {
-        this.getRandomCat()
-          .then((res) => res.json())
+        user.getRandomCat()
           .then((res) => {
             console.log(res.file);
             user
@@ -61,8 +60,7 @@ export default {
               });
           });
       } else {
-        this.getRandomDog()
-          .then((res) => res.json())
+        user.getRandomDog()
           .then((res) => {
             console.log(res.message);
             user
@@ -79,12 +77,6 @@ export default {
               });
           });
       }
-    },
-    async getRandomCat() {
-      return await fetch("https://aws.random.cat/meow");
-    },
-    async getRandomDog() {
-      return await fetch("https://dog.ceo/api/breeds/image/random");
     },
     remove() {
       this.message = "";
