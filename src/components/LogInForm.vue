@@ -62,9 +62,9 @@ export default {
           this.message = error;
         });
     },
-    remove(){
+    remove() {
       this.message = "";
-    }
+    },
   },
 };
 </script>

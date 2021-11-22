@@ -13,11 +13,11 @@ export default {
     SideBar,
     Chat,
   },
-  mounted(){
-    if(!this.$cookies.isKey("token")){
+  mounted() {
+    if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
     }
-  }
+  },
 };
 </script>
 

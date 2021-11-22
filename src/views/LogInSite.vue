@@ -1,17 +1,16 @@
 <template>
   <div class="login-site">
-     <router-view/>
+    <router-view />
   </div>
- 
 </template>
 
 <script>
 export default {
-  mounted(){
-    if(this.$cookies.isKey("token")){
+  mounted() {
+    if (this.$cookies.isKey("token")) {
       this.$router.push({ name: "MainSite" });
     }
-  }
+  },
 };
 </script>
 

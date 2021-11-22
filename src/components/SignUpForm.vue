@@ -42,49 +42,53 @@ export default {
   },
   methods: {
     signup() {
-      if(Math.random() < 0.5){
-      this.getRandomCat().then(res => res.json()).then(res =>{
-        console.log(res.file);
-        user
-        .signup(this.username, this.password, res.file)
-        .then((token) => {
-          if (token) {
-            this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-            this.$router.push({ name: "MainSite" });
-            this.message = "";
-          }
-        })
-        .catch((error) => {
-          this.message = error;
-        });
-      })
-      }else{
-        this.getRandomDog().then(res => res.json()).then(res =>{
-          console.log(res.message);
-        user
-        .signup(this.username, this.password, res.message)
-        .then((token) => {
-          if (token) {
-            this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-            this.$router.push({ name: "MainSite" });
-            this.message = "";
-          }
-        })
-        .catch((error) => {
-          this.message = error;
-        });
-        })
+      if (Math.random() < 0.5) {
+        this.getRandomCat()
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res.file);
+            user
+              .signup(this.username, this.password, res.file)
+              .then((token) => {
+                if (token) {
+                  this.$cookies.set("token", token, 60 * 60 * 24 * 5);
+                  this.$router.push({ name: "MainSite" });
+                  this.message = "";
+                }
+              })
+              .catch((error) => {
+                this.message = error;
+              });
+          });
+      } else {
+        this.getRandomDog()
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res.message);
+            user
+              .signup(this.username, this.password, res.message)
+              .then((token) => {
+                if (token) {
+                  this.$cookies.set("token", token, 60 * 60 * 24 * 5);
+                  this.$router.push({ name: "MainSite" });
+                  this.message = "";
+                }
+              })
+              .catch((error) => {
+                this.message = error;
+              });
+          });
       }
     },
-    async getRandomCat(){
-      return await fetch('https://aws.random.cat/meow')
+    async getRandomCat() {
+      return await fetch("https://aws.random.cat/meow");
     },
-    async getRandomDog(){
-      return await fetch('https://dog.ceo/api/breeds/image/random')
+    async getRandomDog() {
+      return await fetch("https://dog.ceo/api/breeds/image/random");
     },
-    remove(){
+    remove() {
       this.message = "";
-    }
+    },
   },
 };
 </script>
