@@ -11,9 +11,6 @@
       </DiscordMessages>
     </div>
     <div class="input">
-      <!-- <div class="add">
-        <fa :icon="['fas', 'plus-circle']"></fa>
-      </div> -->
       <div
         class="chat-input"
         id="chat-input"

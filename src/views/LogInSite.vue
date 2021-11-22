@@ -1,15 +1,17 @@
 <template>
   <div class="login-site">
-    <LogInForm />
+     <router-view/>
   </div>
+ 
 </template>
 
 <script>
-import LogInForm from "../components/LogInForm.vue";
 export default {
-  components: {
-    LogInForm,
-  },
+  mounted(){
+    if(this.$cookies.isKey("token")){
+      this.$router.push({ name: "MainSite" });
+    }
+  }
 };
 </script>
 
