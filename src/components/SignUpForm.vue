@@ -16,7 +16,7 @@
         name="passwd"
         id="passwd"
         v-model="password"
-        @keypress.enter="sigup"
+        @keypress.enter="signup"
         @change="remove"
         required
       />
@@ -42,41 +42,18 @@ export default {
   },
   methods: {
     signup() {
-      if (Math.random() < 0.5) {
-        user.getRandomCat()
-          .then((res) => {
-            console.log(res.file);
-            user
-              .signup(this.username, this.password, res.file)
-              .then((token) => {
-                if (token) {
-                  this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-                  this.$router.push({ name: "MainSite" });
-                  this.message = "";
-                }
-              })
-              .catch((error) => {
-                this.message = error;
-              });
-          });
-      } else {
-        user.getRandomDog()
-          .then((res) => {
-            console.log(res.message);
-            user
-              .signup(this.username, this.password, res.message)
-              .then((token) => {
-                if (token) {
-                  this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-                  this.$router.push({ name: "MainSite" });
-                  this.message = "";
-                }
-              })
-              .catch((error) => {
-                this.message = error;
-              });
-          });
-      }
+      user
+        .signup(this.username, this.password)
+        .then((token) => {
+          if (token) {
+            this.$cookies.set("token", token, 60 * 60 * 24 * 5);
+            this.$router.push({ name: "MainSite" });
+            this.message = "";
+          }
+        })
+        .catch((error) => {
+          this.message = error;
+        });
     },
     remove() {
       this.message = "";
