@@ -9,6 +9,14 @@ async function getRandomDog() {
   );
 }
 
+async function randAvt() {
+  if (Math.random() < 0.5) {
+    return getRandomCat().then((rs) => rs.file);
+  } else {
+    return getRandomDog().then((rs) => rs.message);
+  }
+}
+
 async function login(username, passwd) {
   return await fetch(`${api_host}/users/login`, {
     method: "post",
@@ -45,27 +53,17 @@ async function fetching(username, passwd, url) {
 }
 
 async function signup(username, passwd) {
-  if (Math.random() < 0.5) {
-    return getRandomCat().then(async (res) => {
-      const rs = await fetching(username, passwd, res.file);
-      let message_1 = rs.message;
-      if (message_1 == "ok") {
-        return rs.data.token;
+  return randAvt()
+    .then((res) => {
+      return fetching(username, passwd, res);
+    })
+    .then((res) => {
+      if (res.message == "ok") {
+        return res.data.token;
       } else {
-        throw message_1;
+        throw res.message;
       }
     });
-  } else {
-    return getRandomDog().then(async (res) => {
-      const rs = await fetching(username, passwd, res.message);
-      let message_1 = rs.message;
-      if (message_1 == "ok") {
-        return rs.data.token;
-      } else {
-        throw message_1;
-      }
-    });
-  }
 }
 
 export default { login, signup, getRandomCat, getRandomDog };
