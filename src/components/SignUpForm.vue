@@ -1,19 +1,64 @@
 <template>
   <div class="login-form">
-    <form action="https://werewolf-web-services.herokuapp.com/users" method="POST">
+    <form v-on:submit.prevent>
       <label for="username" class="required">User Name</label>
-      <input type="text" name="username" id="username" required/>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        v-model="username"
+        @change="remove"
+        required
+      />
       <label for="passwd" class="required">Password</label>
-      <input type="password" name="passwd" id="passwd" required/>
+      <input
+        type="password"
+        name="passwd"
+        id="passwd"
+        v-model="password"
+        @keypress.enter="signup"
+        @change="remove"
+        required
+      />
+      <div class="alert" v-if="message !== ''">
+        {{ message }}
+      </div>
       <div class="button-group">
-        <button class="signup-btn">Sign Up</button>
+        <button class="signup-btn" @click="signup">Sign Up</button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
+import user from "../services/user.js";
 export default {
+  data() {
+    return {
+      username: "",
+      password: "",
+      message: "",
+    };
+  },
+  methods: {
+    signup() {
+      user
+        .signup(this.username, this.password)
+        .then((token) => {
+          if (token) {
+            this.$cookies.set("token", token, 60 * 60 * 24 * 5);
+            this.$router.push({ name: "MainSite" });
+            this.message = "";
+          }
+        })
+        .catch((error) => {
+          this.message = error;
+        });
+    },
+    remove() {
+      this.message = "";
+    },
+  },
 };
 </script>
 
@@ -60,6 +105,15 @@ button {
   font-size: 1.5rem;
   border-radius: 6px;
 }
+.alert {
+  width: 100%;
+  color: #f02849;
+  font-size: 20px;
+  line-height: 16px;
+  margin-top: 1.5rem;
+  text-align: left;
+  text-transform: capitalize;
+}
 .button-group {
   padding-top: 3rem;
   display: flex;
@@ -71,5 +125,4 @@ button {
   color: white;
   font-size: 1.5rem;
 }
-
 </style>

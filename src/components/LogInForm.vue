@@ -9,6 +9,7 @@
         name="user[username]"
         id="username"
         v-model="username"
+        @change="remove"
         required
       />
       <label for="passwd" class="required">Password</label>
@@ -17,8 +18,13 @@
         name="user[passwd]"
         id="passwd"
         v-model="passwd"
+        @change="remove"
+        @keypress.enter="authorize"
         required
       />
+      <div class="alert" v-if="message !== ''">
+        {{ message }}
+      </div>
       <div class="button-group">
         <button type="button" class="login-btn" @click="authorize">
           Login
@@ -38,6 +44,7 @@ export default {
     return {
       username: "",
       passwd: "",
+      message: "",
     };
   },
   methods: {
@@ -47,13 +54,16 @@ export default {
         .then((token) => {
           if (token) {
             this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-            window.location.assign("/");
-            console.log("oke");
+            this.$router.push({ name: "MainSite" });
+            this.message = "";
           }
         })
         .catch((error) => {
-          console.error(error);
+          this.message = error;
         });
+    },
+    remove() {
+      this.message = "";
     },
   },
 };
@@ -102,16 +112,25 @@ button {
   font-size: 1.5rem;
   border-radius: 6px;
 }
-h1{
+h1 {
   color: white;
   margin: 0;
 }
-h4{
+h4 {
   color: #aaa;
   margin: 0;
 }
 .login-form {
   background-color: #242526;
+}
+.alert {
+  width: 100%;
+  color: #f02849;
+  font-size: 20px;
+  line-height: 16px;
+  margin-top: 1.5rem;
+  text-align: left;
+  text-transform: capitalize;
 }
 .button-group {
   padding-top: 3rem;
