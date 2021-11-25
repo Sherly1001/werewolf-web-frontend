@@ -6,7 +6,7 @@
       <label for="username" class="required">User Name</label>
       <input
         type="text"
-        name="user[username]"
+        name="username"
         id="username"
         v-model="username"
         @change="remove"
@@ -15,7 +15,7 @@
       <label for="passwd" class="required">Password</label>
       <input
         type="password"
-        name="user[passwd]"
+        name="passwd"
         id="passwd"
         v-model="passwd"
         @change="remove"

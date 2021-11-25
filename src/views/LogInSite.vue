@@ -1,11 +1,22 @@
 <template>
   <div class="login-site">
-    <router-view />
+    <SignUpForm v-if="prop"/>
+    <LoginForm v-if="!prop"/>
+    {{ prop }}
   </div>
 </template>
 
 <script>
+import SignUpForm from "../components/SignUpForm.vue";
+import LoginForm from "../components/LogInForm.vue";
 export default {
+  props: {
+    prop: Boolean
+  },
+  components: {
+    LoginForm,
+    SignUpForm,
+  },
   mounted() {
     if (this.$cookies.isKey("token")) {
       this.$router.push({ name: "MainSite" });

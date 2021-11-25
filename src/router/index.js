@@ -1,17 +1,23 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import MainSite from "../views/MainSite.vue";
 import LogInSite from "../views/LogInSite.vue";
-import SignUpForm from "../components/SignUpForm.vue";
-import LoginForm from "../components/LogInForm.vue";
 const routes = [
   {
     path: "/",
+    name: "MainSite",
+    component: MainSite,
+  },
+  {
+    path: "/login",
+    name: "LogIn",
     component: LogInSite,
-    children: [
-      { path: "signup", name: "SignUp", component: SignUpForm },
-      { path: "login", name: "LogIn", component: LoginForm },
-      { path: "", name: "MainSite", component: MainSite },
-    ],
+    props: { prop: false },
+  },
+  {
+    path: "/signup",
+    name: "SignUp",
+    component: LogInSite,
+    props: { prop: true },
   },
   { path: "/:pathMatch(.*)*", redirect: "/" },
 ];
