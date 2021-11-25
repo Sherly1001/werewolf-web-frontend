@@ -1,8 +1,7 @@
 <template>
   <div class="login-site">
-    <SignUpForm v-if="prop"/>
-    <LoginForm v-if="!prop"/>
-    {{ prop }}
+    <SignUpForm v-if="signup"/>
+    <LoginForm v-if="!signup"/>
   </div>
 </template>
 
@@ -11,7 +10,7 @@ import SignUpForm from "../components/SignUpForm.vue";
 import LoginForm from "../components/LogInForm.vue";
 export default {
   props: {
-    prop: Boolean
+    signup: Boolean
   },
   components: {
     LoginForm,

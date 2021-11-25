@@ -11,13 +11,13 @@ const routes = [
     path: "/login",
     name: "LogIn",
     component: LogInSite,
-    props: { prop: false },
+    props: { signup: false },
   },
   {
     path: "/signup",
     name: "SignUp",
     component: LogInSite,
-    props: { prop: true },
+    props: { signup: true },
   },
   { path: "/:pathMatch(.*)*", redirect: "/" },
 ];
