@@ -19,7 +19,7 @@
         id="passwd"
         v-model="passwd"
         @change="remove"
-        @keypress.enter="authorize"
+        @keydown.enter="authorize"
         required
       />
       <div class="alert" v-if="message !== ''">

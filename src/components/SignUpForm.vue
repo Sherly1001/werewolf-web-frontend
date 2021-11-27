@@ -16,7 +16,7 @@
         name="passwd"
         id="passwd"
         v-model="password"
-        @keypress.enter="signup"
+        @keydown.enter="signup"
         @change="remove"
         required
       />

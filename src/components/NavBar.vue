@@ -3,17 +3,21 @@
     <div class="hashtag">
       <fa :icon="['fas', 'hashtag']"></fa>
     </div>
-    <p>rules</p>
+    <p>{{ header }}</p>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  props: {
+    header: String,
+  },
+};
 </script>
 
 <style>
 .navbar {
-    position: relative;
+  position: relative;
   top: 0;
   display: flex;
   flex-direction: row;

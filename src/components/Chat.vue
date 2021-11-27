@@ -1,7 +1,7 @@
 <template>
   <div class="chat">
     <div class="top-navbar">
-      <NavBar />
+      <NavBar header="chat-room" />
     </div>
     <div class="message" id="messages">
       <DiscordMessages v-for="mess in messages" :key="mess">
@@ -19,9 +19,6 @@
       ></div>
     </div>
   </div>
-  <div class="member">
-    <Member />
-  </div>
 </template>
 
 <script>
@@ -29,13 +26,11 @@ import {
   DiscordMessage,
   DiscordMessages,
 } from "@discord-message-components/vue";
-import Member from "./Member.vue";
 import NavBar from "./NavBar.vue";
 export default {
   components: {
     DiscordMessage,
     DiscordMessages,
-    Member,
     NavBar,
   },
   data() {
@@ -65,7 +60,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 ::-webkit-scrollbar {
   width: 12px;
   background-color: transparent;
@@ -91,7 +86,6 @@ export default {
   top: 0;
 }
 .chat {
-  position: relative;
   background: #36393f;
   color: #8e9297;
   flex-grow: 1;
