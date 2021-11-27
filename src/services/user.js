@@ -66,4 +66,23 @@ async function signup(username, passwd) {
     });
 }
 
-export default { login, signup, getRandomCat, getRandomDog };
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2)
+    return parts
+      .pop()
+      .split(";")
+      .shift();
+}
+
+async function getAllUser() {
+  let token = getCookie("token");
+  return await fetch(`${api_host}/users`, {
+    headers: {
+      Authorization: token,
+    },
+  }).then((res) => res.json());
+}
+
+export default { login, signup, getAllUser };
