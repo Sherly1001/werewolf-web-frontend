@@ -1,14 +1,14 @@
 <template>
   <div class="member">
-    <Navbar header="Members"/>
+    <Navbar header="Members" />
     <div class="users">
-      <div class="user"  v-for="user in users" :key="user.username">
+      <div class="user" v-for="user in users" :key="user.username">
         <div class="img-container">
           <img :src="user.avatar_url" alt="" />
           <div class="status-circle"></div>
         </div>
         <div class="user-info">
-        <p class="username">{{ user.username }}</p>
+          <p class="username">{{ user.username }}</p>
         </div>
       </div>
     </div>
@@ -17,9 +17,9 @@
 
 <script>
 import user from "../services/user.js";
-import Navbar from "./NavBar.vue"
+import Navbar from "./NavBar.vue";
 export default {
-  components:{
+  components: {
     Navbar,
   },
   data() {
@@ -30,7 +30,6 @@ export default {
   created() {
     user.getAllUser().then((res) => {
       this.users = res.data;
-      console.log(this.users);
     });
   },
 };

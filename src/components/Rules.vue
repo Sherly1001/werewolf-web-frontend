@@ -11,14 +11,17 @@
         understand the game
       </p>
     </div>
+    <InputBar />
   </div>
 </template>
 
 <script>
 import Navbar from "./NavBar.vue";
+import InputBar from "./InputBar.vue";
 export default {
   components: {
     Navbar,
+    InputBar,
   },
 };
 </script>
@@ -33,8 +36,8 @@ export default {
 }
 .rule {
   margin: 0 3rem 0 3rem;
-  position: absolute;
-  bottom: 3rem;
+  position: relative;
+  bottom: 0rem;
 }
 .logo {
   color: white;

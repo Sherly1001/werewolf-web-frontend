@@ -10,14 +10,7 @@
         </DiscordMessage>
       </DiscordMessages>
     </div>
-    <div class="input">
-      <div
-        class="chat-input"
-        id="chat-input"
-        contenteditable="true"
-        @keyup="addMessage"
-      ></div>
-    </div>
+    <InputBar :getText="getMess" />
   </div>
 </template>
 
@@ -27,11 +20,13 @@ import {
   DiscordMessages,
 } from "@discord-message-components/vue";
 import NavBar from "./NavBar.vue";
+import InputBar from "./InputBar.vue";
 export default {
   components: {
     DiscordMessage,
     DiscordMessages,
     NavBar,
+    InputBar,
   },
   data() {
     return {
@@ -40,21 +35,14 @@ export default {
     };
   },
   methods: {
-    addMessage(e) {
-      const messages = document.getElementById("messages");
-      // messages.scrollTop = messages.scrollHeight;
-      if (e.key == "Enter" && !e.shiftKey) {
-        let chatInput = document.getElementById("chat-input");
-        let text = chatInput.innerText.replace(/\n/g, "");
-        if (text) {
-          this.messages.push(text);
+    getMess(mess) {
+      this.$options.sockets.onmessage = (res) => {
+        let data = JSON.parse(res.data);
+        if (data.SendRes.message_id) {
+          this.messages.push(mess);
+          console.log(this.messages);
         }
-        chatInput.innerHTML = "";
-        messages.scrollTop = messages.scrollHeight;
-        console.log(messages.scrollTop);
-        messages.scrollTop += 940;
-        console.log(messages.scrollTop);
-      }
+      };
     },
   },
 };
@@ -86,6 +74,7 @@ export default {
   top: 0;
 }
 .chat {
+  position: relative;
   background: #36393f;
   color: #8e9297;
   flex-grow: 1;
@@ -100,32 +89,5 @@ export default {
   position: relative;
   bottom: 0;
   border: none !important;
-}
-.input {
-  width: 100%;
-  position: relative;
-  bottom: 0;
-  margin-bottom: 0;
-  padding: 0rem 2rem 0.5rem 2rem;
-  border-radius: 6px;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  height: 4.5rem;
-}
-.chat-input {
-  position: relative;
-  bottom: 0;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  max-height: 20rem;
-  background: #40444b;
-  width: 100%;
-  outline: none;
-  overflow: hidden;
-  border: none;
-  color: white;
 }
 </style>

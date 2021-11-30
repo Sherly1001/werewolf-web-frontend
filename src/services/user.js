@@ -85,4 +85,4 @@ async function getAllUser() {
   }).then((res) => res.json());
 }
 
-export default { login, signup, getAllUser };
+export default { login, signup, getAllUser, getCookie };
