@@ -10,7 +10,7 @@
         </DiscordMessage>
       </DiscordMessages>
     </div>
-    <InputBar :getText="getMess" />
+    <InputBar :emitSend="onSendMsg"/>
   </div>
 </template>
 
@@ -31,20 +31,24 @@ export default {
   data() {
     return {
       messages: [],
-      message: "",
     };
   },
-  methods: {
-    getMess(mess) {
-      this.$options.sockets.onmessage = (res) => {
-        let data = JSON.parse(res.data);
-        if (data.SendRes.message_id) {
-          this.messages.push(mess);
-          console.log(this.messages);
-        }
-      };
-    },
+  mounted() {
+    console.log("Connect...");
+    // this.$connect(`wss://werewolf-web-services.herokuapp.com/ws?token=${this.data.token}`);
+    this.$options.sockets.onmessage = m => {
+      if (m.data.SendRes) {
+        // update is sent
+      } else if (m.data.BroadCaseMsg) {
+        this.messages.push(m.data.BroadCaseMsg.message);
+      }
+    }
   },
+  methods: {
+    onSendMsg(m) {
+      this.messages.push(m);
+    }
+  }
 };
 </script>
 

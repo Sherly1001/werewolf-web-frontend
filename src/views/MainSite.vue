@@ -29,11 +29,6 @@ export default {
   mounted() {
     if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
-    } else {
-      console.log("Connect...");
-      this.$connect(
-        `wss://werewolf-web-services.herokuapp.com/ws?token=${this.token}`
-      );
     }
   },
 };

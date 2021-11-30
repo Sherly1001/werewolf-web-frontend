@@ -13,7 +13,7 @@
 //import sendAndRecv from "../services/SendAndRecv.js";
 export default {
   props: {
-    getText: Function,
+    emitSend: Function,
   },
   data() {
     return {
@@ -27,11 +27,11 @@ export default {
         let chatInput = document.getElementById("chat-input");
         let text = chatInput.innerText.replace(/\n/g, "");
         if (text) {
-          this.getText(text);
           this.$socket.send(
             JSON.stringify({ SendReq: { channel_id: "1", message: text } })
           );
         }
+        this.emitSend(text);
         chatInput.innerHTML = "";
         messages.scrollTop = messages.scrollHeight;
         messages.scrollTop += 940;

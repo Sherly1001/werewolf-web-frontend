@@ -25,7 +25,9 @@ createApp(App)
     VueNativeSock,
     `wss://werewolf-web-services.herokuapp.com/ws?token=${token}`,
     {
-      connectManually: true,
+      reconnection: true,
+      reconnectionAttempts: 5, 
+      reconnectionDelay: 3000
     }
   )
   .component("fa", FontAwesomeIcon)
