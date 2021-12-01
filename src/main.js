@@ -27,7 +27,8 @@ createApp(App)
     {
       reconnection: true,
       reconnectionAttempts: 5, 
-      reconnectionDelay: 3000
+      reconnectionDelay: 3000,
+      connectManually: true,
     }
   )
   .component("fa", FontAwesomeIcon)

@@ -4,13 +4,13 @@
       <NavBar header="chat-room" />
     </div>
     <div class="message" id="messages">
-      <DiscordMessages v-for="mess in messages" :key="mess">
-        <DiscordMessage author="Dawn">
-          {{ mess }}
+      <DiscordMessages v-for="mess in messages" :key="mess.message_id">
+        <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
+          {{ mess.message }}
         </DiscordMessage>
       </DiscordMessages>
     </div>
-    <InputBar :emitSend="onSendMsg"/>
+    <InputBar :emitSend="onSendMsg" />
   </div>
 </template>
 
@@ -21,7 +21,11 @@ import {
 } from "@discord-message-components/vue";
 import NavBar from "./NavBar.vue";
 import InputBar from "./InputBar.vue";
+import user from "../services/user.js";
 export default {
+  props: {
+    info: Object,
+  },
   components: {
     DiscordMessage,
     DiscordMessages,
@@ -31,24 +35,46 @@ export default {
   data() {
     return {
       messages: [],
+      token: user.getCookie("token"),
+      message: "",
+      channel_id: "1",
+      users: [],
     };
   },
   mounted() {
-    console.log("Connect...");
-    // this.$connect(`wss://werewolf-web-services.herokuapp.com/ws?token=${this.data.token}`);
-    this.$options.sockets.onmessage = m => {
-      if (m.data.SendRes) {
-        // update is sent
-      } else if (m.data.BroadCaseMsg) {
-        this.messages.push(m.data.BroadCaseMsg.message);
+    this.$options.sockets.onmessage = (m) => {
+      let messageData = {
+        message: this.message,
+        channel_id: this.channel_id,
+        username: this.info.username,
+        avatar_url: this.info.avatar_url,
+        message_id: "",
+      };
+      let data = JSON.parse(m.data);
+      if (data.SendRes) {
+        messageData.message_id = data.SendRes.message_id;
+        this.messages.push(messageData);
+      } else if (data.BroadCastMsg) {
+        user.getAllUser().then((res) => {
+          this.users = res.data;
+          let userSend = this.users.filter(
+            (val) => val.id == data.BroadCastMsg.user_id
+          );
+          messageData.username = userSend[0].username;
+          messageData.avatar_url = userSend[0].avatar_url;
+          messageData.message = data.BroadCastMsg.message;
+          messageData.channel_id = data.BroadCastMsg.channel_id;
+          messageData.message_id = data.BroadCastMsg.message_id;
+          this.messages.push(messageData);
+        });
       }
-    }
+    };
   },
   methods: {
     onSendMsg(m) {
-      this.messages.push(m);
-    }
-  }
+      this.message = m;
+    },
+  },
 };
 </script>
 

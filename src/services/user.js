@@ -85,4 +85,13 @@ async function getAllUser() {
   }).then((res) => res.json());
 }
 
-export default { login, signup, getAllUser, getCookie };
+async function getInfo() {
+  let token = getCookie("token");
+  return await fetch(`${api_host}/users/info`, {
+    headers: {
+      Authorization: token,
+    },
+  }).then((res) => res.json());
+}
+
+export default { login, signup, getAllUser, getCookie, getInfo };

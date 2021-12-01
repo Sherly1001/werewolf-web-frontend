@@ -1,6 +1,6 @@
 <template>
   <div class="login-form">
-    <form v-on:submit.prevent>
+    <form v-on:submit.prevent="signup">
       <label for="username" class="required">User Name</label>
       <input
         type="text"
@@ -16,7 +16,6 @@
         name="passwd"
         id="passwd"
         v-model="password"
-        @keydown.enter="signup"
         @change="remove"
         required
       />
@@ -24,7 +23,7 @@
         {{ message }}
       </div>
       <div class="button-group">
-        <button class="signup-btn" @click="signup">Sign Up</button>
+        <button class="signup-btn" type="submit">Sign Up</button>
       </div>
     </form>
   </div>

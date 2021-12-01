@@ -1,7 +1,7 @@
 <template>
   <div class="main-site">
     <SideBar />
-    <Chat v-if="chat" />
+    <Chat v-if="chat" :info="info" />
     <Rules v-else />
     <Member />
   </div>
@@ -24,12 +24,19 @@ export default {
     return {
       token: user.getCookie("token"),
       chat: true,
+      info: {},
     };
   },
   mounted() {
     if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
     }
+    if (this.token) {
+      this.$connect(
+        `wss://werewolf-web-services.herokuapp.com/ws?token=${this.token}`
+      );
+    }
+    user.getInfo().then((res) => (this.info = res.data));
   },
 };
 </script>
