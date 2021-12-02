@@ -22,6 +22,7 @@ import {
 import NavBar from "./NavBar.vue";
 import InputBar from "./InputBar.vue";
 import user from "../services/user.js";
+//import {ComponentInternalInstance , getCurrentInstance, onMounted} from "vue";
 export default {
   props: {
     info: Object,
@@ -42,33 +43,36 @@ export default {
     };
   },
   mounted() {
-    this.$options.sockets.onmessage = (m) => {
-      let messageData = {
-        message: this.message,
-        channel_id: this.channel_id,
-        username: this.info.username,
-        avatar_url: this.info.avatar_url,
-        message_id: "",
-      };
-      let data = JSON.parse(m.data);
-      if (data.SendRes) {
-        messageData.message_id = data.SendRes.message_id;
-        this.messages.push(messageData);
-      } else if (data.BroadCastMsg) {
-        user.getAllUser().then((res) => {
-          this.users = res.data;
-          let userSend = this.users.filter(
-            (val) => val.id == data.BroadCastMsg.user_id
-          );
-          messageData.username = userSend[0].username;
-          messageData.avatar_url = userSend[0].avatar_url;
-          messageData.message = data.BroadCastMsg.message;
-          messageData.channel_id = data.BroadCastMsg.channel_id;
-          messageData.message_id = data.BroadCastMsg.message_id;
+    this.$options.sockets.onopen = () => {
+      this.$socket.send(JSON.stringify('GetUsers'));
+    }
+      this.$options.sockets.onmessage = (m) => {
+        let messageData = {
+          message: this.message,
+          channel_id: this.channel_id,
+          username: this.info.username,
+          avatar_url: this.info.avatar_url,
+          message_id: "",
+        };
+        let data = JSON.parse(m.data);
+        if (data.GetUsersRes) {
+          this.users = data.GetUsersRes;
+        }
+        if (data.SendRes) {
+          messageData.message_id = data.SendRes.message_id;
           this.messages.push(messageData);
-        });
-      }
-    };
+        } else if (data.BroadCastMsg) {
+            let userSend = this.users.filter(
+              (val) => val.id == data.BroadCastMsg.user_id
+            );
+            messageData.username = userSend[0].username;
+            messageData.avatar_url = userSend[0].avatar_url;
+            messageData.message = data.BroadCastMsg.message;
+            messageData.channel_id = data.BroadCastMsg.channel_id;
+            messageData.message_id = data.BroadCastMsg.message_id;
+            this.messages.push(messageData);
+        }
+      };
   },
   methods: {
     onSendMsg(m) {

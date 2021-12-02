@@ -101,4 +101,9 @@ img {
 .user-info p {
   margin-top: 0;
 }
+@media only screen and (max-width: 1000px) {
+  .member {
+    display: none;
+  }
+}
 </style>

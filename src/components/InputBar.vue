@@ -1,11 +1,13 @@
 <template>
   <div class="input">
+    <div class="chat-area">
     <div
       class="chat-input"
       id="chat-input"
       contenteditable="true"
       @keyup="sendMessage"
     ></div>
+    </div>
   </div>
 </template>
 
@@ -53,14 +55,21 @@ export default {
   width: 100%;
   height: 4.5rem;
 }
-.chat-input {
-  /* position: relative;
-  bottom: 0; */
+.chat-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   max-height: 20rem;
+  border-radius: 5px;
   background: #40444b;
-  width: 90%;
+}
+.chat-input {
+  /* position: relative;
+  bottom: 0; */
+  width: 97%;
   outline: none;
   overflow: hidden;
   border: none;
