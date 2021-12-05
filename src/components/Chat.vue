@@ -22,10 +22,11 @@ import {
 import NavBar from "./NavBar.vue";
 import InputBar from "./InputBar.vue";
 import user from "../services/user.js";
-//import {ComponentInternalInstance , getCurrentInstance, onMounted} from "vue";
+import recv from "../services/SendAndRecv.js";
 export default {
   props: {
     info: Object,
+    messagesRecv: Array,
   },
   components: {
     DiscordMessage,
@@ -44,35 +45,42 @@ export default {
   },
   mounted() {
     this.$options.sockets.onopen = () => {
-      this.$socket.send(JSON.stringify('GetUsers'));
-    }
-      this.$options.sockets.onmessage = (m) => {
-        let messageData = {
-          message: this.message,
-          channel_id: this.channel_id,
-          username: this.info.username,
-          avatar_url: this.info.avatar_url,
-          message_id: "",
-        };
-        let data = JSON.parse(m.data);
-        if (data.GetUsersRes) {
-          this.users = data.GetUsersRes;
-        }
-        if (data.SendRes) {
-          messageData.message_id = data.SendRes.message_id;
-          this.messages.push(messageData);
-        } else if (data.BroadCastMsg) {
-            let userSend = this.users.filter(
-              (val) => val.id == data.BroadCastMsg.user_id
-            );
-            messageData.username = userSend[0].username;
-            messageData.avatar_url = userSend[0].avatar_url;
-            messageData.message = data.BroadCastMsg.message;
-            messageData.channel_id = data.BroadCastMsg.channel_id;
-            messageData.message_id = data.BroadCastMsg.message_id;
-            this.messages.push(messageData);
-        }
+      this.$socket.send(JSON.stringify("GetUsers"));
+      this.$socket.send(
+        JSON.stringify({
+          GetMsg: { channel_id: this.channel_id, offset: 0, limit: 50 },
+        })
+      );
+    };
+    this.$options.sockets.onmessage = (m) => {
+      let messageData = {
+        message: this.message,
+        channel_id: this.channel_id,
+        username: this.info.username,
+        avatar_url: this.info.avatar_url,
+        message_id: "",
       };
+      let data = JSON.parse(m.data);
+      console.log(data);
+      if (data.GetUsersRes) {
+        this.users = data.GetUsersRes;
+      }
+      if (data.GetMsgRes) {
+        this.messages = recv.getAllMessages(
+          this.users,
+          messageData,
+          data.GetMsgRes.messages,
+        );
+      }
+      if (data.SendRes) {
+        messageData.message_id = data.SendRes.message_id;
+        this.messages.push(messageData);
+      } else if (data.BroadCastMsg) {
+        this.messages.push(
+          recv.receiveMessage(this.users, messageData, data.BroadCastMsg)
+        );
+      }
+    };
   },
   methods: {
     onSendMsg(m) {

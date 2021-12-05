@@ -18,7 +18,7 @@ export default {
   },
   mounted() {
     if (this.$cookies.isKey("token")) {
-      this.$router.push({ name: "MainSite" });
+      this.$router.push({ name: "Rules" });
     }
   },
 };

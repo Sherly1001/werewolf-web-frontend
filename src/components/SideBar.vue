@@ -17,20 +17,24 @@
           </button>
         </div>
         <div>
-          <button class="category-list">
-            <div class="hashtag">
-              <fa :icon="['fas', 'hashtag']"></fa>
-            </div>
-            <p>Lobby</p>
-          </button>
+          <router-link :to="{ name: 'Chat' }">
+            <button class="category-list" @click="active">
+              <div class="hashtag">
+                <fa :icon="['fas', 'hashtag']"></fa>
+              </div>
+              <p>Lobby</p>
+            </button>
+          </router-link>
         </div>
         <div>
-          <button class="category-list active">
-            <div class="hashtag">
-              <fa :icon="['fas', 'hashtag']"></fa>
-            </div>
-            <p>Rule</p>
-          </button>
+          <router-link :to="{ name: 'Rules' }">
+            <button class="category-list">
+              <div class="hashtag">
+                <fa :icon="['fas', 'hashtag']"></fa>
+              </div>
+              <p>Rules</p>
+            </button>
+          </router-link>
         </div>
       </div>
       <div class="category">
@@ -68,6 +72,14 @@ export default {};
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+}
+a.router-link-active button {
+  color: white;
+  background: #4f545c;
+}
+
 .sidebar {
   position: relative;
   left: 0;
@@ -105,7 +117,7 @@ export default {};
   cursor: pointer;
   background: transparent;
   border: none;
-  color: #8E9297;
+  color: #8e9297;
   width: 100%;
   text-transform: lowercase;
 }

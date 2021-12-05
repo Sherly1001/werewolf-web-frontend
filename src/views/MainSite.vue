@@ -1,24 +1,19 @@
 <template>
   <div class="main-site">
     <SideBar />
-    <Chat v-if="chat" :info="info" />
-    <Rules v-else />
+    <router-view :info="info" />
     <Member />
   </div>
 </template>
 
 <script>
 import SideBar from "../components/SideBar.vue";
-import Chat from "../components/Chat.vue";
 import Member from "../components/Member.vue";
-import Rules from "../components/Rules.vue";
 import user from "../services/user.js";
 export default {
   components: {
     SideBar,
-    Chat,
     Member,
-    Rules,
   },
   data() {
     return {
