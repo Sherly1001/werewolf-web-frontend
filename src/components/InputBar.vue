@@ -1,12 +1,9 @@
 <template>
   <div class="input">
     <div class="chat-area">
-      <div
-        class="chat-input"
-        id="chat-input"
-        contenteditable="true"
-        @keyup="sendMessage"
-      ></div>
+      <div class="chat-input" id="chat-input" contenteditable="true" @keyup="sendMessage">
+        <!-- <form v-on:submit.prevent="sendMessage"></form> -->
+      </div>
     </div>
   </div>
 </template>
@@ -24,15 +21,15 @@ export default {
   methods: {
     sendMessage(e) {
       if (e.key == "Enter" && !e.shiftKey) {
-        let chatInput = document.getElementById("chat-input");
-        let text = chatInput.innerText.replace(/\n/g, "");
-        if (text) {
-          this.$socket.send(
-            JSON.stringify({ SendReq: { channel_id: "1", message: text } })
-          );
-        }
-        this.emitSend(text);
-        chatInput.innerHTML = "";
+      let chatInput = document.getElementById("chat-input");
+      let text = chatInput.innerText.replace(/\n/g, "");
+      if (text) {
+        this.$socket.send(
+          JSON.stringify({ SendReq: { channel_id: "1", message: text } })
+        );
+      }
+      this.emitSend(text);
+      chatInput.innerHTML = "";
       }
     },
   },

@@ -3,7 +3,7 @@
     <div class="top-navbar">
       <NavBar header="chat-room" />
     </div>
-    <div class="message" id="messages">
+    <div class="messages" id="messages">
       <DiscordMessages v-for="mess in messagesRecv" :key="mess.message_id">
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           {{ mess.message }}
@@ -35,13 +35,16 @@ export default {
     };
   },
   watch: {
-    messagesRecv(newVal, oldVal) {
-      console.log("Old: ", oldVal);
-      console.log("New: ", newVal);
-      let messages = document.getElementById("messages");
-      if(newVal){
-      messages.scrollTop = messages.scrollHeight;
-      }
+    messagesRecv: {
+      handler: function(newVal) {
+        let messages = document.getElementById("messages");
+        if (newVal) {
+          setTimeout(() => {
+            messages.scrollTop = messages.scrollHeight;
+          }, 0);
+        }
+      },
+      deep: true,
     },
   },
 };
@@ -80,9 +83,10 @@ export default {
   height: 100vh;
   overflow: hidden;
 }
-.message {
+.messages {
   height: 88vh;
   overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 .discord-messages {
   position: relative;
