@@ -9,8 +9,7 @@ function receiveMessage(users, messageData, data) {
 }
 
 function getAllMessages(users, messageData, data) {
-  var store = [];
-  console.log(data);
+  let store = [];
   for (let i = 0; i < data.length; ++i) {
     let userSend = users.filter((val) => val.id == data[i].user_id);
     messageData.channel_id = "1";
@@ -20,7 +19,6 @@ function getAllMessages(users, messageData, data) {
     messageData.message_id = data[i].message_id;
     store.unshift({...messageData});
   }
-  console.log(store);
   return store;
 }
 

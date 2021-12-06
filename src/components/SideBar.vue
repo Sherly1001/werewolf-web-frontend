@@ -64,11 +64,20 @@
         </div>
       </div>
     </div>
+    <button @click="logout">Log Out</button>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    logout() {
+      this.$cookies.remove("token");
+      this.$router.push({ name: "LogIn" });
+      this.$disconnect();
+    },
+  }
+};
 </script>
 
 <style scoped>

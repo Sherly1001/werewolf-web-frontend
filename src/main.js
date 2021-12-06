@@ -26,8 +26,8 @@ createApp(App)
     `wss://werewolf-web-services.herokuapp.com/ws?token=${token}`,
     {
       reconnection: true,
-      reconnectionAttempts: 5, 
-      reconnectionDelay: 3000,
+      reconnectionAttempts: 100, 
+      reconnectionDelay: 300,
       connectManually: true,
     }
   )

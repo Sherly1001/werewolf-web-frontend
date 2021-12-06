@@ -4,13 +4,12 @@
       <NavBar header="chat-room" />
     </div>
     <div class="message" id="messages">
-      <DiscordMessages v-for="mess in messages" :key="mess.message_id">
+      <DiscordMessages v-for="mess in messagesRecv" :key="mess.message_id">
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           {{ mess.message }}
         </DiscordMessage>
       </DiscordMessages>
     </div>
-    <InputBar :emitSend="onSendMsg" />
   </div>
 </template>
 
@@ -20,9 +19,6 @@ import {
   DiscordMessages,
 } from "@discord-message-components/vue";
 import NavBar from "./NavBar.vue";
-import InputBar from "./InputBar.vue";
-import user from "../services/user.js";
-import recv from "../services/SendAndRecv.js";
 export default {
   props: {
     info: Object,
@@ -32,59 +28,20 @@ export default {
     DiscordMessage,
     DiscordMessages,
     NavBar,
-    InputBar,
   },
   data() {
     return {
-      messages: [],
-      token: user.getCookie("token"),
-      message: "",
       channel_id: "1",
-      users: [],
     };
   },
-  mounted() {
-    this.$options.sockets.onopen = () => {
-      this.$socket.send(JSON.stringify("GetUsers"));
-      this.$socket.send(
-        JSON.stringify({
-          GetMsg: { channel_id: this.channel_id, offset: 0, limit: 50 },
-        })
-      );
-    };
-    this.$options.sockets.onmessage = (m) => {
-      let messageData = {
-        message: this.message,
-        channel_id: this.channel_id,
-        username: this.info.username,
-        avatar_url: this.info.avatar_url,
-        message_id: "",
-      };
-      let data = JSON.parse(m.data);
-      console.log(data);
-      if (data.GetUsersRes) {
-        this.users = data.GetUsersRes;
+  watch: {
+    messagesRecv(newVal, oldVal) {
+      console.log("Old: ", oldVal);
+      console.log("New: ", newVal);
+      let messages = document.getElementById("messages");
+      if(newVal){
+      messages.scrollTop = messages.scrollHeight;
       }
-      if (data.GetMsgRes) {
-        this.messages = recv.getAllMessages(
-          this.users,
-          messageData,
-          data.GetMsgRes.messages,
-        );
-      }
-      if (data.SendRes) {
-        messageData.message_id = data.SendRes.message_id;
-        this.messages.push(messageData);
-      } else if (data.BroadCastMsg) {
-        this.messages.push(
-          recv.receiveMessage(this.users, messageData, data.BroadCastMsg)
-        );
-      }
-    };
-  },
-  methods: {
-    onSendMsg(m) {
-      this.message = m;
     },
   },
 };

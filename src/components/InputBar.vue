@@ -1,18 +1,17 @@
 <template>
   <div class="input">
     <div class="chat-area">
-    <div
-      class="chat-input"
-      id="chat-input"
-      contenteditable="true"
-      @keyup="sendMessage"
-    ></div>
+      <div
+        class="chat-input"
+        id="chat-input"
+        contenteditable="true"
+        @keyup="sendMessage"
+      ></div>
     </div>
   </div>
 </template>
 
 <script>
-//import sendAndRecv from "../services/SendAndRecv.js";
 export default {
   props: {
     emitSend: Function,
@@ -24,7 +23,6 @@ export default {
   },
   methods: {
     sendMessage(e) {
-      const messages = document.getElementById("messages");
       if (e.key == "Enter" && !e.shiftKey) {
         let chatInput = document.getElementById("chat-input");
         let text = chatInput.innerText.replace(/\n/g, "");
@@ -35,8 +33,6 @@ export default {
         }
         this.emitSend(text);
         chatInput.innerHTML = "";
-        messages.scrollTop = messages.scrollHeight;
-        messages.scrollTop += 940;
       }
     },
   },
