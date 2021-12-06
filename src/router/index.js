@@ -1,11 +1,17 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import MainSite from "../views/MainSite.vue";
 import LogInSite from "../views/LogInSite.vue";
+import Chat from "../components/Chat.vue";
+import Rules from "../components/Rules.vue";
 const routes = [
   {
     path: "/",
     name: "MainSite",
     component: MainSite,
+    children: [
+      { path: "rooms/lobby", name: "Chat", component: Chat },
+      { path: "rooms/rules", name: "Rules", component: Rules },
+    ],
   },
   {
     path: "/login",
@@ -19,7 +25,7 @@ const routes = [
     component: LogInSite,
     props: { signup: true },
   },
-  { path: "/:pathMatch(.*)*", redirect: "/" },
+  { path: "/:pathMatch(.*)*", redirect: "/rooms/rules" },
 ];
 
 const router = createRouter({

@@ -1,6 +1,6 @@
 <template>
   <div class="login-form">
-    <form v-on:submit.prevent>
+    <form v-on:submit.prevent="authorize">
       <h1>Welcome Back!!</h1>
       <h4>We're so excited to see you again!</h4>
       <label for="username" class="required">User Name</label>
@@ -19,14 +19,13 @@
         id="passwd"
         v-model="passwd"
         @change="remove"
-        @keydown.enter="authorize"
         required
       />
       <div class="alert" v-if="message !== ''">
         {{ message }}
       </div>
       <div class="button-group">
-        <button type="button" class="login-btn" @click="authorize">
+        <button type="submit" class="login-btn">
           Login
         </button>
         <div class="separator">OR</div>
@@ -54,7 +53,7 @@ export default {
         .then((token) => {
           if (token) {
             this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-            this.$router.push({ name: "MainSite" });
+            this.$router.push({ name: "Rules" });
             this.message = "";
           }
         })
