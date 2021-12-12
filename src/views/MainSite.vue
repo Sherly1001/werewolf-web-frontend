@@ -67,7 +67,7 @@ export default {
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
         this.online = this.users.filter(user => user.is_online);
-        this.offline = this.users.filter(user => user.is_online);
+        this.offline = this.users.filter(user => !user.is_online);
       }
       if (data.GetMsgRes) {
         this.messages = recv.getAllMessages(
