@@ -94,4 +94,12 @@ async function getInfo() {
   }).then((res) => res.json());
 }
 
-export default { login, signup, getAllUser, getCookie, getInfo, fetching };
+function containsObject(obj, list) {
+  for(let  i = 0; i < list.length; ++i) {
+    if(list[i].id == obj.id)
+      return i;
+  }
+  return -1;
+}
+
+export default { login, signup, getAllUser, getCookie, getInfo, containsObject };

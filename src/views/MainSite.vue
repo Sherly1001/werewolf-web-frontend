@@ -1,11 +1,11 @@
 <template>
   <div class="main-site">
-    <SideBar :info="info"/>
+    <SideBar :info="info" />
     <div class="replace-area">
       <router-view :info="info" :messagesRecv="messages" />
       <InputBar :emitSend="onSendMsg" />
     </div>
-    <Member :online="online" :offline="offline"/>
+    <Member :online="online" :offline="offline" />
   </div>
 </template>
 
@@ -31,6 +31,7 @@ export default {
       message: "",
       online: [],
       offline: [],
+      position: 0,
     };
   },
   mounted() {
@@ -66,8 +67,26 @@ export default {
       let data = JSON.parse(m.data);
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
-        this.online = this.users.filter(user => user.is_online);
-        this.offline = this.users.filter(user => !user.is_online);
+        this.online = this.users.filter((user) => user.is_online);
+        this.offline = this.users.filter((user) => !user.is_online);
+      }
+      if (data.UserOnline) {
+        data.UserOnline.is_online = true;
+        this.position = user.containsObject(data.UserOnline, this.online);
+        if (this.position == -1) {
+          this.online.push(data.UserOnline);
+          let find = user.containsObject(data.UserOnline, this.offline);
+          this.offline.splice(find, 1);
+        }
+      }
+      if (data.UserOffline) {
+        data.UserOffline.is_online = false;
+        this.position = user.containsObject(data.UserOffline, this.offline);
+        if (this.position == -1) {
+          this.offline.push(data.UserOffline);
+          let find = user.containsObject(data.UserOffline, this.online);
+          this.online.splice(find, 1);
+        }
       }
       if (data.GetMsgRes) {
         this.messages = recv.getAllMessages(
