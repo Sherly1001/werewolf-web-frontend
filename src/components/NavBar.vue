@@ -27,9 +27,6 @@ export default {
 }
 .hashtag {
   margin-right: 6px;
-  /* display: flex;
-  align-items: center;
-  justify-content: center; */
 }
 .navbar p {
   color: white;

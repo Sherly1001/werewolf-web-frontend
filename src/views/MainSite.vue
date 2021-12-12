@@ -1,11 +1,11 @@
 <template>
   <div class="main-site">
-    <SideBar />
+    <SideBar :info="info"/>
     <div class="replace-area">
       <router-view :info="info" :messagesRecv="messages" />
       <InputBar :emitSend="onSendMsg" />
     </div>
-    <Member />
+    <Member :online="online" :offline="offline"/>
   </div>
 </template>
 
@@ -29,6 +29,8 @@ export default {
       messages: [],
       channel_id: "1",
       message: "",
+      online: [],
+      offline: [],
     };
   },
   mounted() {
@@ -64,6 +66,8 @@ export default {
       let data = JSON.parse(m.data);
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
+        this.online = this.users.filter(user => user.is_online == true);
+        this.offline = this.users.filter(user => user.is_online == false);
       }
       if (data.GetMsgRes) {
         this.messages = recv.getAllMessages(

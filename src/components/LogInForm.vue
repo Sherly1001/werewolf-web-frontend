@@ -156,9 +156,9 @@ h4 {
 
 .separator::before,
 .separator::after {
-  content: "";
-  flex: 1;
-  border-bottom: 1px solid #aaa;
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #aaa;
 }
 
 .separator:not(:empty)::before {

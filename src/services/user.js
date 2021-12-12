@@ -94,4 +94,4 @@ async function getInfo() {
   }).then((res) => res.json());
 }
 
-export default { login, signup, getAllUser, getCookie, getInfo };
+export default { login, signup, getAllUser, getCookie, getInfo, fetching };
