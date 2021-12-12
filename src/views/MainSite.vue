@@ -66,8 +66,8 @@ export default {
       let data = JSON.parse(m.data);
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
-        this.online = this.users.filter(user => user.is_online == true);
-        this.offline = this.users.filter(user => user.is_online == false);
+        this.online = this.users.filter(user => user.is_online);
+        this.offline = this.users.filter(user => user.is_online);
       }
       if (data.GetMsgRes) {
         this.messages = recv.getAllMessages(
