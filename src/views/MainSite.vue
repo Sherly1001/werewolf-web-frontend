@@ -1,11 +1,11 @@
 <template>
   <div class="main-site">
-    <SideBar />
+    <SideBar :info="info" />
     <div class="replace-area">
       <router-view :info="info" :messagesRecv="messages" />
       <InputBar :emitSend="onSendMsg" />
     </div>
-    <Member />
+    <Member :online="Object.values(online)" :offline="Object.values(offline)" />
   </div>
 </template>
 
@@ -29,6 +29,9 @@ export default {
       messages: [],
       channel_id: "1",
       message: "",
+      online: {},
+      offline: {},
+      position: 0,
     };
   },
   mounted() {
@@ -64,6 +67,26 @@ export default {
       let data = JSON.parse(m.data);
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
+        this.users
+          .filter((user) => user.is_online)
+          .forEach((u) => {
+            this.online[u.id] = u;
+          });
+        this.users
+          .filter((user) => !user.is_online)
+          .forEach((u) => {
+            this.offline[u.id] = u;
+          });
+      }
+      if (data.UserOnline) {
+        data.UserOnline.is_online = true;
+        this.online[data.UserOnline.id] = data.UserOnline;
+        delete this.offline[data.UserOnline.id];
+      }
+      if (data.UserOffline) {
+        data.UserOffline.is_online = false;
+        this.offline[data.UserOffline.id] = data.UserOffline;
+        delete this.online[data.UserOffline.id];
       }
       if (data.GetMsgRes) {
         this.messages = recv.getAllMessages(

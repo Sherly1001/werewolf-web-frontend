@@ -34,6 +34,12 @@ export default {
       channel_id: "1",
     };
   },
+  mounted() {
+    let messages = document.getElementById("messages");
+    setTimeout(() => {
+      messages.scrollTop = messages.scrollHeight;
+    }, 0);
+  },
   watch: {
     messagesRecv: {
       handler: function(newVal) {

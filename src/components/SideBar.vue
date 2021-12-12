@@ -64,19 +64,34 @@
         </div>
       </div>
     </div>
-    <button @click="logout">Log Out</button>
+    <div class="info">
+      <div class="img-container">
+        <img :src="info.avatar_url" alt="" />
+        <div class="status-circle"></div>
+      </div>
+      <div class="user-info">
+        <p class="username">{{ info.username }}</p>
+        <p class="win-lose">#{{ info.win }}/#{{ info.lose }}</p>
+      </div>
+      <div class="setting">
+        <fa :icon="['fas', 'cog']" class="cog-btn" @click="logout"></fa>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    info: Object,
+  },
   methods: {
     logout() {
       this.$cookies.remove("token");
       this.$router.push({ name: "LogIn" });
       this.$disconnect();
     },
-  }
+  },
 };
 </script>
 
@@ -87,8 +102,14 @@ a {
 a.router-link-active button {
   color: white;
   background: #4f545c;
+  pointer-events: none;
 }
 
+img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
 .sidebar {
   position: relative;
   left: 0;
@@ -150,10 +171,11 @@ a.router-link-active button {
   font-size: 16px;
   height: 2rem;
   border-radius: 4px;
+  margin-top: 5px;
 }
 .category-list:hover {
   color: white;
-  background: #4f545c;
+  background: rgba(79, 84, 92, 0.16);
 }
 .hashtag {
   margin-right: 6px;
@@ -164,5 +186,50 @@ a.router-link-active button {
 .active {
   color: white;
   background: #4f545c;
+}
+.logOut-btn span {
+  color: red;
+}
+.logOut-btn {
+  cursor: pointer;
+}
+.info {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 3rem;
+  background: #292b2f;
+  margin-bottom: 1px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.info p {
+  margin: 0;
+}
+.img-container {
+  width: 32px;
+  height: 32px;
+  position: relative;
+}
+.status-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #3ba55d;
+  border: 3px solid #2f3136;
+  bottom: -3px;
+  right: -4px;
+  position: absolute;
+}
+
+.cog-btn {
+  cursor: pointer;
+}
+
+.cog-btn:hover {
+  transform: rotate(360deg);
+  transition: 1s;
 }
 </style>

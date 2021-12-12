@@ -2,35 +2,30 @@
   <div class="member">
     <Navbar header="Members" />
     <div class="users">
-      <div class="user" v-for="user in users" :key="user.username">
-        <div class="img-container">
-          <img :src="user.avatar_url" alt="" />
-          <div class="status-circle"></div>
-        </div>
-        <div class="user-info">
-          <p class="username">{{ user.username }}</p>
-        </div>
-      </div>
+      <State :title="online_state" :users="online" />
+      <br>
+      <State :title="offline_state" :users="offline" />
     </div>
   </div>
 </template>
 
 <script>
-import user from "../services/user.js";
 import Navbar from "./NavBar.vue";
+import State from "./State.vue";
 export default {
-  components: {
-    Navbar,
+  props: {
+    online: Array,
+    offline: Array,
   },
   data() {
     return {
-      users: [],
-    };
+      online_state: "online",
+      offline_state: "offline",
+    }
   },
-  created() {
-    user.getAllUser().then((res) => {
-      this.users = res.data;
-    });
+  components: {
+    Navbar,
+    State,
   },
 };
 </script>
@@ -56,11 +51,6 @@ export default {
   border: 2px solid #282a2d;
   border-radius: 10px;
 }
-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-}
 .member {
   width: 15.5rem;
   position: relative;
@@ -74,32 +64,6 @@ img {
   margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
-}
-.user {
-  display: flex;
-  margin-top: 0.9rem;
-  margin-left: 1rem;
-}
-.img-container {
-  width: 32px;
-  height: 32px;
-  position: relative;
-}
-.status-circle {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: grey;
-  border: 2px solid white;
-  bottom: 0;
-  right: 0;
-  position: absolute;
-}
-.user-info {
-  margin-left: 10px;
-}
-.user-info p {
-  margin-top: 0;
 }
 @media only screen and (max-width: 1000px) {
   .member {
