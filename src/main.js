@@ -11,12 +11,14 @@ import VueNativeSock from "vue-native-websocket-vue3";
 import "@discord-message-components/vue/dist/style.css";
 import user from "./services/user.js";
 import dotenv from "dotenv";
-dotenv.config();
+import mitt from 'mitt';
 
+dotenv.config();
+const emitter = mitt();
 const token = user.getCookie("token");
 
 library.add(fas);
-createApp(App)
+const app = createApp(App)
   .use(router)
   .use(Vuex)
   .use(VueCookies)
@@ -31,5 +33,6 @@ createApp(App)
       connectManually: true,
     }
   )
-  .component("fa", FontAwesomeIcon)
-  .mount("#app");
+  .component("fa", FontAwesomeIcon);
+  app.config.globalProperties.emitter = emitter;
+  app.mount("#app");

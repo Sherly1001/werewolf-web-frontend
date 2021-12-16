@@ -3,7 +3,7 @@
     <div class="top-navbar">
       <NavBar header="chat-room" />
     </div>
-    <div class="messages" id="messages">
+    <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
       <DiscordMessages v-for="mess in messagesRecv" :key="mess.message_id">
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           {{ mess.message }}
@@ -31,8 +31,27 @@ export default {
   },
   data() {
     return {
-      channel_id: "1",
+      channel_id: 1,
     };
+  },
+  created() {
+    this.sendChannelId();
+  },
+  methods: {
+    loadMoreMess() {
+      let offset = this.messagesRecv.length;
+      let messages = document.getElementById("messages");
+      if (messages.scrollTop == 0) {
+        this.$socket.send(
+          JSON.stringify({
+            GetMsg: { channel_id: this.channel_id, offset: offset, limit: 20 },
+          })
+        );
+      }
+    },
+    sendChannelId() {
+      this.emitter.emit("sendChannel", this.channel_id);
+    },
   },
   mounted() {
     let messages = document.getElementById("messages");
@@ -44,7 +63,10 @@ export default {
     messagesRecv: {
       handler: function(newVal) {
         let messages = document.getElementById("messages");
-        if (newVal) {
+        if (
+          newVal &&
+          messages.scrollHeight - messages.scrollTop == messages.clientHeight
+        ) {
           setTimeout(() => {
             messages.scrollTop = messages.scrollHeight;
           }, 0);

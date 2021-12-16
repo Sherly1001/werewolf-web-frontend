@@ -1,9 +1,12 @@
 <template>
   <div class="input">
     <div class="chat-area">
-      <div class="chat-input" id="chat-input" contenteditable="true" @keyup="sendMessage">
-        <!-- <form v-on:submit.prevent="sendMessage"></form> -->
-      </div>
+      <div
+        :class="allow_check ==true ? 'chat-input' : 'chat-input disable-cursor block-blinking'"
+        id="chat-input"
+        contenteditable="true"
+        @keydown="sendMessage"
+      ></div>
     </div>
   </div>
 </template>
@@ -12,25 +15,57 @@
 export default {
   props: {
     emitSend: Function,
+    info: Object,
   },
   data() {
     return {
       message: "",
+      channel_id: "",
+      readable: null,
+      allow_check: null,
     };
+  },
+  mounted() {
+    this.emitter.on("sendChannel", (channel_id) => {
+      this.channel_id = channel_id;
+      console.log(this.channel_id);
+    });
   },
   methods: {
     sendMessage(e) {
+      if (!this.allow_check) {
+        e.preventDefault();
+      }
+      else {
       if (e.key == "Enter" && !e.shiftKey) {
-      let chatInput = document.getElementById("chat-input");
-      let text = chatInput.innerText.replace(/\n/g, "");
-      if (text) {
-        this.$socket.send(
-          JSON.stringify({ SendReq: { channel_id: "1", message: text } })
-        );
+        e.preventDefault();
+        let chatInput = document.getElementById("chat-input");
+        let text = chatInput.innerText.replace(/\n/g, "");
+        if (text) {
+          this.$socket.send(
+            JSON.stringify({ SendReq: { channel_id: "1", message: text } })
+          );
+        }
+        this.emitSend(text);
+        chatInput.innerHTML = "";
       }
-      this.emitSend(text);
-      chatInput.innerHTML = "";
       }
+    },
+  },
+  watch: {
+    info: {
+      handler: function(newVal) {
+        this.readable = newVal;
+        console.log(this.readable);
+      },
+      deep: true,
+    },
+    channel_id: {
+      handler: function(newVal) {
+        this.allow_check = this.readable.per[newVal].sendable;
+        console.log(this.allow_check);
+      },
+      deep: true,
     },
   },
 };
@@ -59,9 +94,16 @@ export default {
   border-radius: 5px;
   background: #40444b;
 }
+
+.disable-cursor {
+  cursor: not-allowed;
+}
+
+.block-blinking{
+  caret-color: transparent;
+}
+
 .chat-input {
-  /* position: relative;
-  bottom: 0; */
   width: 97%;
   outline: none;
   overflow: hidden;

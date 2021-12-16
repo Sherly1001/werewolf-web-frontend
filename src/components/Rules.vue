@@ -23,6 +23,19 @@ export default {
     Navbar,
     InputBar,
   },
+  data() {
+    return {
+      channel_id: 0,
+    };
+  },
+  created() {
+    this.sendChannelId();
+  },
+  methods: {
+    sendChannelId() {
+      this.emitter.emit("sendChannel", this.channel_id);
+    },
+  },
 };
 </script>
 

@@ -3,7 +3,7 @@
     <SideBar :info="info" />
     <div class="replace-area">
       <router-view :info="info" :messagesRecv="messages" />
-      <InputBar :emitSend="onSendMsg" />
+      <InputBar :emitSend="onSendMsg" :info="info" />
     </div>
     <Member :online="Object.values(online)" :offline="Object.values(offline)" />
   </div>
@@ -54,6 +54,7 @@ export default {
             GetMsg: { channel_id: this.channel_id, offset: 0, limit: 20 },
           })
         );
+        this.$socket.send(JSON.stringify({ GetPers: {} }));
       };
     }
     this.$options.sockets.onmessage = (m) => {
@@ -89,11 +90,17 @@ export default {
         delete this.online[data.UserOffline.id];
       }
       if (data.GetMsgRes) {
-        this.messages = recv.getAllMessages(
-          this.users,
-          messageData,
-          data.GetMsgRes.messages
+        this.messages.unshift(
+          ...recv.getAllMessages(
+            this.users,
+            messageData,
+            data.GetMsgRes.messages
+          )
         );
+      }
+      if (data.GetPersRes) {
+        this.info.per = data.GetPersRes;
+        console.log(this.info);
       }
       if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
