@@ -28,7 +28,6 @@ export default {
   mounted() {
     this.emitter.on("sendChannel", (channel_id) => {
       this.channel_id = channel_id;
-      console.log(this.channel_id);
     });
   },
   methods: {
@@ -56,14 +55,12 @@ export default {
     info: {
       handler: function(newVal) {
         this.readable = newVal;
-        console.log(this.readable);
       },
       deep: true,
     },
     channel_id: {
       handler: function(newVal) {
         this.allow_check = this.readable.per[newVal].sendable;
-        console.log(this.allow_check);
       },
       deep: true,
     },

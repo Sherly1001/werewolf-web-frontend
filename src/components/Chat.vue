@@ -31,7 +31,7 @@ export default {
   },
   data() {
     return {
-      channel_id: 1,
+      channel_id: "1",
     };
   },
   created() {

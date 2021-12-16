@@ -36,7 +36,6 @@ export default {
   },
   mounted() {
     user.getInfo().then((res) => (this.info = res.data));
-    console.log("Main Mounted");
     if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
     }
@@ -100,7 +99,6 @@ export default {
       }
       if (data.GetPersRes) {
         this.info.per = data.GetPersRes;
-        console.log(this.info);
       }
       if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
