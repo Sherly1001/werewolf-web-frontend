@@ -6,7 +6,7 @@
         id="chat-input"
         contenteditable="true"
         @keydown="sendMessage"
-      ></div>
+      ><span class="banned" v-if="!allow_check">You don't have permission to chat in this channel</span></div>
     </div>
   </div>
 </template>
@@ -106,5 +106,9 @@ export default {
   overflow: hidden;
   border: none;
   color: white;
+}
+.banned {
+  color: #72767d;
+  font-style: italic;
 }
 </style>

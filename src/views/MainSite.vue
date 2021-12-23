@@ -1,6 +1,6 @@
 <template>
   <div class="main-site">
-    <SideBar :info="info" />
+    <SideBar :info="info" :game_id="game_id" :role_id="role_id"/>
     <div class="replace-area">
       <router-view :info="info" :messagesRecv="messages" />
       <InputBar :emitSend="onSendMsg" :info="info" />
@@ -24,6 +24,7 @@ export default {
   data() {
     return {
       token: user.getCookie("token"),
+      ws_url: process.env.VUE_APP_WS_HOST,
       info: {},
       users: [],
       messages: [],
@@ -32,27 +33,28 @@ export default {
       online: {},
       offline: {},
       position: 0,
+      game_id: "",
+      role_id: "",
     };
   },
-  mounted() {
+  created() {
+    console.log("Main Created");
     user.getInfo().then((res) => (this.info = res.data));
     if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
     }
     if (this.token) {
       console.log("Connect");
-      this.$connect(
-        `wss://werewolf-web-services.herokuapp.com/ws?token=${this.token}`
-      );
+      this.$connect(`${this.ws_url}/ws?token=${this.token}`);
       console.log("Connected");
       this.$options.sockets.onopen = () => {
         console.log("On open");
         this.$socket.send(JSON.stringify("GetUsers"));
-        this.$socket.send(
-          JSON.stringify({
-            GetMsg: { channel_id: this.channel_id, offset: 0, limit: 20 },
-          })
-        );
+        // this.$socket.send(
+        //   JSON.stringify({
+        //     GetMsg: { channel_id: this.channel_id, offset: 0, limit: 20 },
+        //   })
+        // );
         this.$socket.send(JSON.stringify({ GetPers: {} }));
       };
     }
@@ -65,6 +67,7 @@ export default {
         message_id: "",
       };
       let data = JSON.parse(m.data);
+      console.log(data);
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
         this.users
@@ -89,24 +92,37 @@ export default {
         delete this.online[data.UserOffline.id];
       }
       if (data.GetMsgRes) {
-        this.messages.unshift(
+        messageData.channel_id = data.GetMsgRes.channel_id;
+        console.log(this.users);
+        this.messages = [
           ...recv.getAllMessages(
             this.users,
             messageData,
             data.GetMsgRes.messages
-          )
-        );
+          ),
+          ...this.messages,
+        ];
       }
       if (data.GetPersRes) {
         this.info.per = data.GetPersRes;
+        for (const key in this.info.per) {
+          if (this.info.per[key].channel_name == "gameplay") {
+            this.game_id = key;
+          }
+          if (this.info.per[key].channel_name == "personal channel") {
+            this.role_id = key;
+            //this.$router.push({name: "Game Room", params: {id: this.role_id}})
+          }
+        }
       }
       if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
-        this.messages.push(messageData);
+        this.messages = [...this.messages, ...[messageData]];
       } else if (data.BroadCastMsg) {
-        this.messages.push(
-          recv.receiveMessage(this.users, messageData, data.BroadCastMsg)
-        );
+        this.messages = [
+          ...this.messages,
+          ...[recv.receiveMessage(this.users, messageData, data.BroadCastMsg)],
+        ];
       }
     };
   },

@@ -37,7 +37,7 @@
           </router-link>
         </div>
       </div>
-      <div class="category">
+      <div class="category" v-if="game_id != '' && role_id != ''">
         <div>
           <button class="expand">
             <div class="drop-down">
@@ -47,20 +47,24 @@
           </button>
         </div>
         <div>
-          <button class="category-list">
-            <div class="hashtag">
-              <fa :icon="['fas', 'hashtag']"></fa>
-            </div>
-            <p>Room</p>
-          </button>
+          <router-link :to="{ name: 'Game Room', params: { id: game_id } }">
+            <button class="category-list">
+              <div class="hashtag">
+                <fa :icon="['fas', 'hashtag']"></fa>
+              </div>
+              <p>Room</p>
+            </button>
+          </router-link>
         </div>
         <div>
-          <button class="category-list">
-            <div class="hashtag">
-              <fa :icon="['fas', 'hashtag']"></fa>
-            </div>
-            <p>Role</p>
-          </button>
+          <router-link :to="{ name: 'Game Room', params: { id: role_id } }">
+            <button class="category-list">
+              <div class="hashtag">
+                <fa :icon="['fas', 'hashtag']"></fa>
+              </div>
+              <p>Role</p>
+            </button>
+          </router-link>
         </div>
       </div>
     </div>
@@ -84,6 +88,8 @@
 export default {
   props: {
     info: Object,
+    game_id: String,
+    role_id: String,
   },
   methods: {
     logout() {

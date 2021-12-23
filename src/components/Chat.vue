@@ -5,7 +5,11 @@
     </div>
     <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
       <DiscordMessages v-for="mess in messagesRecv" :key="mess.message_id">
-        <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
+        <DiscordMessage
+          :author="mess.username"
+          :avatar="mess.avatar_url"
+          v-if="mess.channel_id == channel_id"
+        >
           {{ mess.message }}
         </DiscordMessage>
       </DiscordMessages>
@@ -24,29 +28,33 @@ export default {
     info: Object,
     messagesRecv: Array,
   },
+  data() {
+    return {
+      hasMore: true,
+      channel_id: "1",
+    };
+  },
   components: {
     DiscordMessage,
     DiscordMessages,
     NavBar,
-  },
-  data() {
-    return {
-      channel_id: "1",
-    };
-  },
-  created() {
-    this.sendChannelId();
   },
   methods: {
     loadMoreMess() {
       let offset = this.messagesRecv.length;
       let messages = document.getElementById("messages");
       if (messages.scrollTop == 0) {
-        this.$socket.send(
-          JSON.stringify({
-            GetMsg: { channel_id: this.channel_id, offset: offset, limit: 20 },
-          })
-        );
+        if (this.hasMore) {
+          this.$socket.send(
+            JSON.stringify({
+              GetMsg: {
+                channel_id: this.channel_id,
+                offset: offset,
+                limit: 20,
+              },
+            })
+          );
+        }
       }
     },
     sendChannelId() {
@@ -54,6 +62,8 @@ export default {
     },
   },
   mounted() {
+    console.log("Chat Mounted");
+    this.sendChannelId();
     let messages = document.getElementById("messages");
     setTimeout(() => {
       messages.scrollTop = messages.scrollHeight;
@@ -61,7 +71,12 @@ export default {
   },
   watch: {
     messagesRecv: {
-      handler: function(newVal) {
+      handler: function(newVal, oldVal) {
+        if (oldVal.length > 0) {
+          if (newVal[0].message_id == oldVal[0].message_id) {
+            this.hasMore = false;
+          }
+        }
         let messages = document.getElementById("messages");
         if (
           newVal &&
@@ -108,13 +123,13 @@ export default {
   background: #36393f;
   color: #8e9297;
   flex-grow: 1;
+  -webkit-height: 100vh;
   height: 100vh;
   overflow: hidden;
 }
 .messages {
   height: 88vh;
   overflow-y: scroll;
-  scroll-behavior: smooth;
 }
 .discord-messages {
   position: relative;
