@@ -3,9 +3,12 @@
     <div class="top-navbar">
       <NavBar header="game-room" />
     </div>
-        <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
-      <DiscordMessages v-for="mess in messagesRecv" :key="mess.message_id">
-        <DiscordMessage :author="mess.username" :avatar="mess.avatar_url" v-if="mess.channel_id == channel_id">
+    <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
+      <DiscordMessages
+        v-for="mess in messagesRecv[channel_id]"
+        :key="mess.message_id"
+      >
+        <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           {{ mess.message }}
         </DiscordMessage>
       </DiscordMessages>
@@ -26,7 +29,7 @@ export default {
     NavBar,
   },
   props: {
-    messagesRecv: Array,
+    messagesRecv: Object,
   },
   data() {
     return {
@@ -39,7 +42,7 @@ export default {
     },
   },
   mounted() {
-      this.sendChannelId();
+    this.sendChannelId();
   },
   watch: {
     $route(to) {

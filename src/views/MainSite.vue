@@ -1,6 +1,6 @@
 <template>
   <div class="main-site">
-    <SideBar :info="info" :game_id="game_id" :role_id="role_id"/>
+    <SideBar :info="info" :per="info.per" />
     <div class="replace-area">
       <router-view :info="info" :messagesRecv="messages" />
       <InputBar :emitSend="onSendMsg" :info="info" />
@@ -27,14 +27,12 @@ export default {
       ws_url: process.env.VUE_APP_WS_HOST,
       info: {},
       users: [],
-      messages: [],
-      channel_id: "1",
+      messages: {},
+      channel_id: "",
       message: "",
       online: {},
       offline: {},
       position: 0,
-      game_id: "",
-      role_id: "",
     };
   },
   created() {
@@ -50,24 +48,22 @@ export default {
       this.$options.sockets.onopen = () => {
         console.log("On open");
         this.$socket.send(JSON.stringify("GetUsers"));
-        // this.$socket.send(
-        //   JSON.stringify({
-        //     GetMsg: { channel_id: this.channel_id, offset: 0, limit: 20 },
-        //   })
-        // );
+        this.$socket.send(
+          JSON.stringify({
+            GetMsg: { channel_id: this.channel_id, offset: 0, limit: 20 },
+          })
+        );
         this.$socket.send(JSON.stringify({ GetPers: {} }));
       };
     }
     this.$options.sockets.onmessage = (m) => {
       let messageData = {
         message: this.message,
-        channel_id: this.channel_id,
         username: this.info.username,
         avatar_url: this.info.avatar_url,
         message_id: "",
       };
       let data = JSON.parse(m.data);
-      console.log(data);
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
         this.users
@@ -92,37 +88,48 @@ export default {
         delete this.online[data.UserOffline.id];
       }
       if (data.GetMsgRes) {
-        messageData.channel_id = data.GetMsgRes.channel_id;
-        console.log(this.users);
-        this.messages = [
+        this.messages[data.GetMsgRes.channel_id] = [
           ...recv.getAllMessages(
             this.users,
             messageData,
             data.GetMsgRes.messages
           ),
-          ...this.messages,
+          ...(this.messages[data.GetMsgRes.channel_id] || []),
         ];
       }
       if (data.GetPersRes) {
         this.info.per = data.GetPersRes;
         for (const key in this.info.per) {
-          if (this.info.per[key].channel_name == "gameplay") {
-            this.game_id = key;
-          }
-          if (this.info.per[key].channel_name == "personal channel") {
-            this.role_id = key;
-            //this.$router.push({name: "Game Room", params: {id: this.role_id}})
+          if (!this.messages[key])
+            this.$socket.send(
+              JSON.stringify({
+                GetMsg: { channel_id: key, offset: 0, limit: 20 },
+              })
+            );
+          for (let key in this.messages) {
+            if (!data.GetPersRes[key]) {
+              let tmp = { ...this.messages };
+              delete tmp[key];
+              this.messages = tmp;
+            }
           }
         }
       }
       if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
-        this.messages = [...this.messages, ...[messageData]];
+        console.log(messageData);
+        console.log(this.messages[data.SendRes.channel_id]);
+        this.messages[data.SendRes.channel_id] = [
+          ...this.messages[data.SendRes.channel_id],
+          ...[messageData],
+        ];
+        console.log(this.messages);
       } else if (data.BroadCastMsg) {
-        this.messages = [
-          ...this.messages,
+        this.messages[data.BroadCastMsg.channel_id] = [
+          ...this.messages[data.BroadCastMsg.channel_id],
           ...[recv.receiveMessage(this.users, messageData, data.BroadCastMsg)],
         ];
+        console.log(this.messages);
       }
     };
   },

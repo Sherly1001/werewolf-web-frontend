@@ -3,13 +3,13 @@
     <div class="top-navbar">
       <NavBar header="chat-room" />
     </div>
+
     <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
-      <DiscordMessages v-for="mess in messagesRecv" :key="mess.message_id">
-        <DiscordMessage
-          :author="mess.username"
-          :avatar="mess.avatar_url"
-          v-if="mess.channel_id == channel_id"
-        >
+      <DiscordMessages
+        v-for="mess in messagesRecv[channel_id]"
+        :key="mess.message_id"
+      >
+        <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           {{ mess.message }}
         </DiscordMessage>
       </DiscordMessages>
@@ -26,7 +26,7 @@ import NavBar from "./NavBar.vue";
 export default {
   props: {
     info: Object,
-    messagesRecv: Array,
+    messagesRecv: Object,
   },
   data() {
     return {
@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     loadMoreMess() {
-      let offset = this.messagesRecv.length;
+      let offset = this.messagesRecv[this.channel_id].length;
       let messages = document.getElementById("messages");
       if (messages.scrollTop == 0) {
         if (this.hasMore) {
@@ -72,11 +72,12 @@ export default {
   watch: {
     messagesRecv: {
       handler: function(newVal, oldVal) {
-        if (oldVal.length > 0) {
-          if (newVal[0].message_id == oldVal[0].message_id) {
-            this.hasMore = false;
-          }
-        }
+        console.log(newVal, oldVal);
+        // if (oldVal.length > 0) {
+        //   if (newVal[0].message_id == oldVal[0].message_id) {
+        //     this.hasMore = false;
+        //   }
+        // }
         let messages = document.getElementById("messages");
         if (
           newVal &&

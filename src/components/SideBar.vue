@@ -37,7 +37,7 @@
           </router-link>
         </div>
       </div>
-      <div class="category" v-if="game_id != '' && role_id != ''">
+      <div class="category">
         <div>
           <button class="expand">
             <div class="drop-down">
@@ -46,25 +46,23 @@
             <p class="category-name">Game Room</p>
           </button>
         </div>
-        <div>
-          <router-link :to="{ name: 'Game Room', params: { id: game_id } }">
-            <button class="category-list">
-              <div class="hashtag">
-                <fa :icon="['fas', 'hashtag']"></fa>
-              </div>
-              <p>Room</p>
-            </button>
-          </router-link>
-        </div>
-        <div>
-          <router-link :to="{ name: 'Game Room', params: { id: role_id } }">
-            <button class="category-list">
-              <div class="hashtag">
-                <fa :icon="['fas', 'hashtag']"></fa>
-              </div>
-              <p>Role</p>
-            </button>
-          </router-link>
+        <div class="channel_list">
+          <div v-for="(value, channel) in per" :key="channel">
+            <div
+              v-if="
+                value.channel_name != 'rules' && value.channel_name != 'lobby'
+              "
+            >
+              <router-link :to="{ name: 'Game Room', params: { id: channel } }">
+                <button class="category-list">
+                  <div class="hashtag">
+                    <fa :icon="['fas', 'hashtag']"></fa>
+                  </div>
+                  <p>{{ value.channel_name }}</p>
+                </button>
+              </router-link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -88,8 +86,7 @@
 export default {
   props: {
     info: Object,
-    game_id: String,
-    role_id: String,
+    per: Object,
   },
   methods: {
     logout() {
