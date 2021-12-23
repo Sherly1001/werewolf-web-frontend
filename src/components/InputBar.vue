@@ -10,6 +10,7 @@
         id="chat-input"
         contenteditable="true"
         @keydown="sendMessage"
+        :data-ph="'Message #' + channel_name"
       >
         <span class="banned" v-if="!allow_check"
           >You don't have permission to chat in this channel</span
@@ -31,6 +32,7 @@ export default {
       channel_id: "",
       readable: null,
       allow_check: null,
+      channel_name: "",
     };
   },
   mounted() {
@@ -70,9 +72,8 @@ export default {
     },
     channel_id: {
       handler: function(newVal) {
-        console.log(newVal);
-        console.log(this.readable.per);
         this.allow_check = this.readable.per[newVal].sendable;
+        this.channel_name = this.readable.per[newVal].channel_name
       },
       deep: true,
     },
@@ -122,5 +123,11 @@ export default {
 .banned {
   color: #72767d;
   font-style: italic;
+}
+
+[contentEditable=true]:empty:not(:focus):before{
+  content:attr(data-ph);
+  color: #72767d;
+  font-style:italic;
 }
 </style>
