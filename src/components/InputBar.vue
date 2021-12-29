@@ -10,7 +10,7 @@
         id="chat-input"
         contenteditable="true"
         @keydown="sendMessage"
-        :data-ph="'Message #' + channel_name"
+        :placeholder="'Message @' + channel_name"
       >
         <span class="banned" v-if="!allow_check"
           >You don't have permission to chat in this channel</span
@@ -25,21 +25,15 @@ export default {
   props: {
     emitSend: Function,
     info: Object,
+    channel_id: String,
   },
   data() {
     return {
       message: "",
-      channel_id: "",
       readable: null,
       allow_check: null,
       channel_name: "",
     };
-  },
-  mounted() {
-    this.emitter.on("sendChannel", (channel_id) => {
-      this.channel_id = channel_id;
-      console.log(channel_id, this.channel_id);
-    });
   },
   methods: {
     sendMessage(e) {
@@ -67,13 +61,19 @@ export default {
     info: {
       handler: function(newVal) {
         this.readable = newVal;
+        if (this.readable.per) {
+          this.allow_check = this.readable.per[this.channel_id].sendable;
+          this.channel_name = this.readable.per[this.channel_id].channel_name;
+        }
       },
       deep: true,
     },
     channel_id: {
       handler: function(newVal) {
-        this.allow_check = this.readable.per[newVal].sendable;
-        this.channel_name = this.readable.per[newVal].channel_name
+        if (this.readable) {
+          this.allow_check = this.readable.per[newVal].sendable;
+          this.channel_name = this.readable.per[newVal].channel_name;
+        }
       },
       deep: true,
     },
@@ -125,9 +125,9 @@ export default {
   font-style: italic;
 }
 
-[contentEditable=true]:empty:not(:focus):before{
-  content:attr(data-ph);
+[contentEditable="true"]:empty:before {
+  content: attr(placeholder);
   color: #72767d;
-  font-style:italic;
+  font-style: italic;
 }
 </style>

@@ -2,8 +2,12 @@
   <div class="main-site">
     <SideBar :info="info" :per="info.per" />
     <div class="replace-area">
-      <router-view :info="info" :messagesRecv="messages" />
-      <InputBar :emitSend="onSendMsg" :info="info" />
+      <router-view
+        :info="info"
+        :messagesRecv="messages"
+        :emitChannelId="getChannelId"
+      />
+      <InputBar :emitSend="onSendMsg" :info="info" :channel_id="channel_id" />
     </div>
     <Member :online="Object.values(online)" :offline="Object.values(offline)" />
   </div>
@@ -117,25 +121,24 @@ export default {
       }
       if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
-        console.log(messageData);
-        console.log(this.messages[data.SendRes.channel_id]);
         this.messages[data.SendRes.channel_id] = [
           ...this.messages[data.SendRes.channel_id],
           ...[messageData],
         ];
-        console.log(this.messages);
       } else if (data.BroadCastMsg) {
         this.messages[data.BroadCastMsg.channel_id] = [
           ...this.messages[data.BroadCastMsg.channel_id],
           ...[recv.receiveMessage(this.users, messageData, data.BroadCastMsg)],
         ];
-        console.log(this.messages);
       }
     };
   },
   methods: {
     onSendMsg(m) {
       this.message = m;
+    },
+    getChannelId(channel_id) {
+      this.channel_id = channel_id;
     },
   },
 };

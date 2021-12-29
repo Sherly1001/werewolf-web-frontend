@@ -15,6 +15,7 @@
       </DiscordMessages>
     </div>
   </div>
+  
 </template>
 
 <script>
@@ -27,6 +28,7 @@ export default {
   props: {
     info: Object,
     messagesRecv: Object,
+    emitChannelId: Function,
   },
   data() {
     return {
@@ -57,13 +59,10 @@ export default {
         }
       }
     },
-    sendChannelId() {
-      this.emitter.emit("sendChannel", this.channel_id);
-    },
   },
   mounted() {
     console.log("Chat Mounted");
-    this.sendChannelId();
+    this.emitChannelId(this.channel_id);
     let messages = document.getElementById("messages");
     setTimeout(() => {
       messages.scrollTop = messages.scrollHeight;
@@ -71,13 +70,7 @@ export default {
   },
   watch: {
     messagesRecv: {
-      handler: function(newVal, oldVal) {
-        console.log(newVal, oldVal);
-        // if (oldVal.length > 0) {
-        //   if (newVal[0].message_id == oldVal[0].message_id) {
-        //     this.hasMore = false;
-        //   }
-        // }
+      handler: function(newVal) {
         let messages = document.getElementById("messages");
         if (
           newVal &&

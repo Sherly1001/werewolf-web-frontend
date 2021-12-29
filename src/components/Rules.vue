@@ -17,6 +17,9 @@
 <script>
 import Navbar from "./NavBar.vue";
 export default {
+  props: {
+    emitChannelId: Function,
+  },
   components: {
     Navbar,
   },
@@ -26,12 +29,7 @@ export default {
     };
   },
   mounted() {
-    this.sendChannelId();
-  },
-  methods: {
-    sendChannelId() {
-      this.emitter.emit("sendChannel", this.channel_id);
-    },
+    this.emitChannelId(this.channel_id);
   },
 };
 </script>

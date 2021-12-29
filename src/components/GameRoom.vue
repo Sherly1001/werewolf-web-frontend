@@ -29,6 +29,7 @@ export default {
     NavBar,
   },
   props: {
+    emitChannelId: Function,
     messagesRecv: Object,
   },
   data() {
@@ -36,19 +37,14 @@ export default {
       channel_id: this.$route.params.id,
     };
   },
-  methods: {
-    sendChannelId() {
-      this.emitter.emit("sendChannel", this.channel_id);
-    },
-  },
   mounted() {
-    this.sendChannelId();
+    this.emitChannelId(this.channel_id);
   },
   watch: {
     $route(to) {
       if (to.params.id) {
         this.channel_id = to.params.id;
-        this.sendChannelId();
+        this.emitChannelId(this.channel_id);
       }
     },
   },
