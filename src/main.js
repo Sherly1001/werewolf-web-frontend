@@ -11,14 +11,12 @@ import VueNativeSock from "vue-native-websocket-vue3";
 import "@discord-message-components/vue/dist/style.css";
 import user from "./services/user.js";
 import dotenv from "dotenv";
-import mitt from 'mitt';
 
 dotenv.config();
-const emitter = mitt();
 const token = user.getCookie("token");
 
 library.add(fas);
-const app = createApp(App)
+createApp(App)
   .use(router)
   .use(Vuex)
   .use(VueCookies)
@@ -28,11 +26,10 @@ const app = createApp(App)
     `wss://werewolf-web-services.herokuapp.com/ws?token=${token}`,
     {
       reconnection: true,
-      reconnectionAttempts: 100, 
+      reconnectionAttempts: 100,
       reconnectionDelay: 300,
       connectManually: true,
     }
   )
-  .component("fa", FontAwesomeIcon);
-  app.config.globalProperties.emitter = emitter;
-  app.mount("#app");
+  .component("fa", FontAwesomeIcon)
+  .mount("#app");

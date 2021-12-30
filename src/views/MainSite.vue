@@ -1,10 +1,10 @@
 <template>
   <div class="main-site">
-    <SideBar :info="info" :per="info.per" />
+    <SideBar :info="info" :per="info.per || {}" />
     <div class="replace-area">
       <router-view
         :info="info"
-        :messagesRecv="messages"
+        :messages="messages[channel_id]"
         :emitChannelId="getChannelId"
       />
       <InputBar :emitSend="onSendMsg" :info="info" :channel_id="channel_id" />
@@ -52,11 +52,6 @@ export default {
       this.$options.sockets.onopen = () => {
         console.log("On open");
         this.$socket.send(JSON.stringify("GetUsers"));
-        this.$socket.send(
-          JSON.stringify({
-            GetMsg: { channel_id: this.channel_id, offset: 0, limit: 20 },
-          })
-        );
         this.$socket.send(JSON.stringify({ GetPers: {} }));
       };
     }
@@ -110,12 +105,12 @@ export default {
                 GetMsg: { channel_id: key, offset: 0, limit: 20 },
               })
             );
-          for (let key in this.messages) {
-            if (!data.GetPersRes[key]) {
-              let tmp = { ...this.messages };
-              delete tmp[key];
-              this.messages = tmp;
-            }
+        }
+        for (let key in this.messages) {
+          if (!data.GetPersRes[key]) {
+            let tmp = { ...this.messages };
+            delete tmp[key];
+            this.messages = tmp;
           }
         }
       }

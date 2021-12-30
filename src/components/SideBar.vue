@@ -17,22 +17,22 @@
           </button>
         </div>
         <div>
-          <router-link :to="{ name: 'Chat' }">
+          <router-link :to="{ name: 'Chat', params: { name: 'rules' } }">
+            <button class="category-list" @click="active">
+              <div class="hashtag">
+                <fa :icon="['fas', 'hashtag']"></fa>
+              </div>
+              <p>Rules</p>
+            </button>
+          </router-link>
+        </div>
+        <div>
+          <router-link :to="{ name: 'Chat', params: { name: 'lobby' } }">
             <button class="category-list" @click="active">
               <div class="hashtag">
                 <fa :icon="['fas', 'hashtag']"></fa>
               </div>
               <p>Lobby</p>
-            </button>
-          </router-link>
-        </div>
-        <div>
-          <router-link :to="{ name: 'Rules' }">
-            <button class="category-list">
-              <div class="hashtag">
-                <fa :icon="['fas', 'hashtag']"></fa>
-              </div>
-              <p>Rules</p>
             </button>
           </router-link>
         </div>
@@ -47,21 +47,22 @@
           </button>
         </div>
         <div class="channel_list">
-          <div v-for="(value, channel) in per" :key="channel">
-            <div
-              v-if="
-                value.channel_name != 'rules' && value.channel_name != 'lobby'
-              "
+          <div
+            v-for="channel_id in Object.keys(per)
+              .filter((cid) => !['0', '1'].includes(cid))
+              .sort()"
+            :key="channel_id"
+          >
+            <router-link
+              :to="{ name: 'Game Room', params: { id: channel_id } }"
             >
-              <router-link :to="{ name: 'Game Room', params: { id: channel } }">
-                <button class="category-list">
-                  <div class="hashtag">
-                    <fa :icon="['fas', 'hashtag']"></fa>
-                  </div>
-                  <p>{{ value.channel_name }}</p>
-                </button>
-              </router-link>
-            </div>
+              <button class="category-list">
+                <div class="hashtag">
+                  <fa :icon="['fas', 'hashtag']"></fa>
+                </div>
+                <p>{{ per[channel_id].channel_name }}</p>
+              </button>
+            </router-link>
           </div>
         </div>
       </div>

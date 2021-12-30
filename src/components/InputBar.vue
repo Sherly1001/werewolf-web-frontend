@@ -30,9 +30,6 @@ export default {
   data() {
     return {
       message: "",
-      readable: null,
-      allow_check: null,
-      channel_name: "",
     };
   },
   methods: {
@@ -57,25 +54,20 @@ export default {
       }
     },
   },
-  watch: {
-    info: {
-      handler: function(newVal) {
-        this.readable = newVal;
-        if (this.readable.per) {
-          this.allow_check = this.readable.per[this.channel_id].sendable;
-          this.channel_name = this.readable.per[this.channel_id].channel_name;
-        }
-      },
-      deep: true,
+  computed: {
+    allow_check: function() {
+      return this.info.per
+        ? this.info.per[this.channel_id]
+          ? this.info.per[this.channel_id].sendable
+          : false
+        : false;
     },
-    channel_id: {
-      handler: function(newVal) {
-        if (this.readable) {
-          this.allow_check = this.readable.per[newVal].sendable;
-          this.channel_name = this.readable.per[newVal].channel_name;
-        }
-      },
-      deep: true,
+    channel_name: function() {
+      return this.info.per
+        ? this.info.per[this.channel_id]
+          ? this.info.per[this.channel_id].channel_name
+          : ""
+        : "";
     },
   },
 };

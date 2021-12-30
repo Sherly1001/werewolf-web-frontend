@@ -5,17 +5,13 @@
     </div>
 
     <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
-      <DiscordMessages
-        v-for="mess in messagesRecv[channel_id]"
-        :key="mess.message_id"
-      >
+      <DiscordMessages v-for="mess in messages" :key="mess.message_id">
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           {{ mess.message }}
         </DiscordMessage>
       </DiscordMessages>
     </div>
   </div>
-  
 </template>
 
 <script>
@@ -27,13 +23,17 @@ import NavBar from "./NavBar.vue";
 export default {
   props: {
     info: Object,
-    messagesRecv: Object,
+    messages: Array,
     emitChannelId: Function,
   },
   data() {
+    const cids = { rules: "0", lobby: "1" };
+    const channel_id =
+      cids[this.$route.params.name] || this.$route.params.id || "0";
     return {
       hasMore: true,
-      channel_id: "1",
+      channel_id,
+      cids,
     };
   },
   components: {
@@ -43,9 +43,9 @@ export default {
   },
   methods: {
     loadMoreMess() {
-      let offset = this.messagesRecv[this.channel_id].length;
-      let messages = document.getElementById("messages");
-      if (messages.scrollTop == 0) {
+      let offset = this.messages.length;
+      let msg = document.getElementById("messages");
+      if (msg.scrollTop <= 100) {
         if (this.hasMore) {
           this.$socket.send(
             JSON.stringify({
@@ -63,25 +63,30 @@ export default {
   mounted() {
     console.log("Chat Mounted");
     this.emitChannelId(this.channel_id);
-    let messages = document.getElementById("messages");
+    let msg = document.getElementById("messages");
     setTimeout(() => {
-      messages.scrollTop = messages.scrollHeight;
+      msg.scrollTop = msg.scrollHeight;
     }, 0);
   },
   watch: {
-    messagesRecv: {
+    messages: {
       handler: function(newVal) {
-        let messages = document.getElementById("messages");
+        let msg = document.getElementById("messages");
         if (
           newVal &&
-          messages.scrollHeight - messages.scrollTop == messages.clientHeight
+          msg.scrollHeight - msg.scrollTop <= msg.clientHeight + 100
         ) {
           setTimeout(() => {
-            messages.scrollTop = messages.scrollHeight;
+            msg.scrollTop = msg.scrollHeight;
           }, 0);
         }
       },
       deep: true,
+    },
+    $route(to) {
+      const cid = this.cids[to.params.name] || to.params.id || "0";
+      this.channel_id = cid;
+      this.emitChannelId(cid);
     },
   },
 };
