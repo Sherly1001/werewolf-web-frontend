@@ -10,7 +10,7 @@
         id="chat-input"
         contenteditable="true"
         @keydown="sendMessage"
-        :placeholder="'Message @' + channel_name"
+        :placeholder="'Message #' + channel_name"
       >
         <span class="banned" v-if="!allow_check"
           >You don't have permission to chat in this channel</span

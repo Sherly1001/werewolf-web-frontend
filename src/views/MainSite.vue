@@ -80,18 +80,15 @@ export default {
           .forEach((u) => {
             this.offline[u.id] = u;
           });
-      }
-      if (data.UserOnline) {
+      } else if (data.UserOnline) {
         data.UserOnline.is_online = true;
         this.online[data.UserOnline.id] = data.UserOnline;
         delete this.offline[data.UserOnline.id];
-      }
-      if (data.UserOffline) {
+      } else if (data.UserOffline) {
         data.UserOffline.is_online = false;
         this.offline[data.UserOffline.id] = data.UserOffline;
         delete this.online[data.UserOffline.id];
-      }
-      if (data.GetMsgRes) {
+      } else if (data.GetMsgRes) {
         this.messages[data.GetMsgRes.channel_id] = [
           ...recv.getAllMessages(
             this.users,
@@ -100,8 +97,7 @@ export default {
           ),
           ...(this.messages[data.GetMsgRes.channel_id] || []),
         ];
-      }
-      if (data.GetPersRes) {
+      } else if (data.GetPersRes) {
         this.info.per = data.GetPersRes;
         for (const key in this.info.per) {
           if (!this.messages[key])
@@ -110,16 +106,15 @@ export default {
                 GetMsg: { channel_id: key, offset: 0, limit: 20 },
               })
             );
-          for (let key in this.messages) {
-            if (!data.GetPersRes[key]) {
-              let tmp = { ...this.messages };
-              delete tmp[key];
-              this.messages = tmp;
-            }
+        }
+        for (let key in this.messages) {
+          if (!data.GetPersRes[key]) {
+            let tmp = { ...this.messages };
+            delete tmp[key];
+            this.messages = tmp;
           }
         }
-      }
-      if (data.SendRes) {
+      } else if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
         this.messages[data.SendRes.channel_id] = [
           ...this.messages[data.SendRes.channel_id],
