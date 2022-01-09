@@ -130,7 +130,7 @@ export default {
   },
   methods: {
     onSendMsg(m) {
-      this.message = m;
+      this.message = m.split(/<@(\d+)>/g);
     },
     getChannelId(channel_id) {
       this.channel_id = channel_id;
