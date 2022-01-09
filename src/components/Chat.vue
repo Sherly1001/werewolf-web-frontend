@@ -7,7 +7,12 @@
     <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
       <DiscordMessages v-for="mess in messages" :key="mess.message_id">
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
-          {{ mess.message }}
+          <template v-for="(yay, index) in mess.message" :key="index">
+            <template v-if="yay.match(regex) == null">{{ yay }}</template>
+            <DiscordMention :highlight="true" v-else>
+              {{ yay }}
+            </DiscordMention>
+          </template>
         </DiscordMessage>
       </DiscordMessages>
     </div>
@@ -18,6 +23,7 @@
 import {
   DiscordMessage,
   DiscordMessages,
+  DiscordMention,
 } from "@discord-message-components/vue";
 import NavBar from "./NavBar.vue";
 export default {
@@ -34,18 +40,20 @@ export default {
       hasMore: true,
       channel_id,
       cids,
+      regex: /(\d{19})/g,
     };
   },
   components: {
     DiscordMessage,
     DiscordMessages,
+    DiscordMention,
     NavBar,
   },
   methods: {
     loadMoreMess() {
       let offset = this.messages.length;
       let msg = document.getElementById("messages");
-      if (msg.scrollTop <= 100) {
+      if (msg.scrollTop == 0) {
         if (this.hasMore) {
           this.$socket.send(
             JSON.stringify({
@@ -134,5 +142,19 @@ export default {
   position: relative;
   bottom: 0;
   border: none !important;
+}
+.highlight {
+  position: relative;
+  background-color: rgba(250, 166, 26, 0.1);
+}
+.highlight::before {
+  background-color: #faa61a;
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 2px;
 }
 </style>
