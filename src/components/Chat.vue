@@ -9,8 +9,8 @@
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           <template v-for="(yay, index) in mess.message" :key="index">
             <template v-if="yay.match(regex) == null">{{ yay }}</template>
-            <DiscordMention :highlight="true" class="highlight" v-else>
-              {{ yay }}
+            <DiscordMention :highlight="true" v-else>
+              {{ users.filter(i => {if(i.id == yay) return i.username})[0].username }}
             </DiscordMention>
           </template>
         </DiscordMessage>
@@ -31,6 +31,7 @@ export default {
     info: Object,
     messages: Array,
     emitChannelId: Function,
+    users: Object,
   },
   data() {
     const cids = { rules: "0", lobby: "1" };
