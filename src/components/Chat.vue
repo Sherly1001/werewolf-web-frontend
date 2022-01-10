@@ -9,7 +9,7 @@
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
           <template v-for="(yay, index) in mess.message" :key="index">
             <template v-if="yay.match(regex) == null">{{ yay }}</template>
-            <DiscordMention :highlight="true" v-else>
+            <DiscordMention :highlight="true" class="highlight" v-else>
               {{ yay }}
             </DiscordMention>
           </template>
