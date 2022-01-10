@@ -1,6 +1,11 @@
 <template>
   <div class="title">{{ title }} ー {{ users.length }}</div>
-  <div class="user" v-for="user in users" :key="user.username">
+  <div
+    class="user"
+    v-for="user in users"
+    :key="user.username"
+    @click="showInfo"
+  >
     <div class="img-container">
       <img :src="user.avatar_url" alt="" />
       <div class="status-circle-online" v-if="user.is_online"></div>
@@ -9,15 +14,26 @@
     <div class="user-info">
       <p class="username">{{ user.username }}</p>
     </div>
+    <Profile :userInfo="user"/>
   </div>
+      
 </template>
 
 <script>
+import Profile from "./Profile.vue";
 export default {
+  components: {
+    Profile,
+  },
   props: {
     title: String,
     users: Array,
   },
+  data() {
+    return {
+      tmp: {},
+    }
+  }
 };
 </script>
 
@@ -31,6 +47,13 @@ img {
   display: flex;
   margin-top: 0.9rem;
   margin-left: 1rem;
+  position: relative;
+  cursor: pointer;
+  border-radius: 4px;
+  padding-top: 5px;
+}
+.user:hover {
+  background: rgba(79, 84, 92, 0.16);
 }
 .img-container {
   width: 32px;
@@ -71,5 +94,8 @@ img {
   font-weight: 800;
   align-items: center;
   text-align: center;
+}
+.profile-contain {
+  position: relative;
 }
 </style>

@@ -66,7 +66,6 @@ export default {
       let data = JSON.parse(m.data);
       if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
-        console.log(this.users);
         this.users
           .filter((user) => user.is_online)
           .forEach((u) => {
