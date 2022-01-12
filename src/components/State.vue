@@ -14,9 +14,10 @@
     <div class="user-info">
       <p class="username">{{ user.username }}</p>
     </div>
-    <Profile :userInfo="user"/>
+      <!-- <Profile :userInfo="user"/> -->
+    
   </div>
-      
+      <Profile :userInfo="users[0]"/>
 </template>
 
 <script>
