@@ -7,8 +7,20 @@
       <div class="status-circle-offline" v-else></div>
     </div>
     <div class="name-and-id">
-      <div class="name"><p>{{userInfo.username}}</p></div>
-      <div class="id"><p>&lt;@{{userInfo.id}}&gt;</p></div>
+      <div class="name">
+        <p>{{ userInfo.username }}</p>
+      </div>
+      <div class="id">
+        <p>&lt;@{{ userInfo.id }}&gt;</p>
+      </div>
+    </div>
+    <div class="win-lose">
+      <div class="win">
+        <p><span style="color:white;">Win: </span>{{ userInfo.win }} </p>
+      </div>
+      <div class="lose">
+        <p><span style="color: white;">Lose: </span>{{ userInfo.lose }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -69,7 +81,6 @@ img {
   border: 6px solid #2f3136;
   border-radius: 50%;
   background-color: #2f3136;
-
 }
 .banner {
   width: 100%;
@@ -83,7 +94,7 @@ img {
   text-align: left;
   margin-left: 10px;
   margin-right: 10px;
-  border-bottom: 1px solid #FFFFFF0F;
+  border-bottom: 1px solid #ffffff0f;
 }
 .name {
   color: white;
@@ -93,5 +104,4 @@ img {
 .id p {
   margin-top: 5px;
 }
-
 </style>
