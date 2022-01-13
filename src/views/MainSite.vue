@@ -88,7 +88,9 @@ export default {
         data.UserOnline.is_online = true;
         this.online[data.UserOnline.id] = data.UserOnline;
         delete this.offline[data.UserOnline.id];
-        if (data.user.filter((u) => u.id === data.UserOnline.id).length === 0) {
+        if (
+          this.users.filter((u) => u.id === data.UserOnline.id).length === 0
+        ) {
           this.users = [...this.users, data.UserOnline];
         }
       } else if (data.UserOffline) {
