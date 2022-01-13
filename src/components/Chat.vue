@@ -64,7 +64,6 @@ export default {
   data() {
     const cids = { rules: "0", lobby: "1", 0: "rules", 1: "lobby" };
     return {
-      hasMore: true,
       cids,
       r_user: /<@(\d+)>/,
       r_channel: /<#(\d+)>/,
@@ -74,18 +73,17 @@ export default {
     loadMoreMess() {
       let offset = this.messages.length;
       let msg = document.getElementById("messages");
-      if (msg.scrollTop == 0) {
-        if (this.hasMore) {
-          this.$socket.send(
-            JSON.stringify({
-              GetMsg: {
-                channel_id: this.channel_id,
-                offset: offset,
-                limit: 20,
-              },
-            })
-          );
-        }
+      if (this.hasMore && msg.scrollTop <= 100) {
+        console.log("get more", this.channel_id);
+        this.$socket.send(
+          JSON.stringify({
+            GetMsg: {
+              channel_id: this.channel_id,
+              offset: offset,
+              limit: 20,
+            },
+          })
+        );
       }
     },
     to_channel(match) {
@@ -142,6 +140,9 @@ export default {
   computed: {
     channel_id: function () {
       return this.cids[this.$route.params.name] || this.$route.params.id || "0";
+    },
+    hasMore: function () {
+      return this.messages.hasMore;
     },
   },
 };
