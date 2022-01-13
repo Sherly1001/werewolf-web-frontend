@@ -1,14 +1,14 @@
 <template>
   <div class="main-site">
-    <SideBar :info="info" :per="info.per || {}" />
+    <SideBar :info="info" :per="info.per" />
     <div class="replace-area">
       <router-view
-        :info="info"
+        :per="info.per"
         :messages="messages[channel_id]"
         :emitChannelId="getChannelId"
         :users="users"
+        :onSendMsg="onSendMsg"
       />
-      <InputBar :emitSend="onSendMsg" :info="info" :channel_id="channel_id" />
     </div>
     <Member :online="Object.values(online)" :offline="Object.values(offline)" />
   </div>
@@ -18,22 +18,28 @@
 import SideBar from "../components/SideBar.vue";
 import Member from "../components/Member.vue";
 import user from "../services/user.js";
-import InputBar from "../components/InputBar.vue";
 import recv from "../services/SendAndRecv.js";
 export default {
   components: {
     SideBar,
     Member,
-    InputBar,
   },
   data() {
     return {
       token: user.getCookie("token"),
       ws_url: process.env.VUE_APP_WS_HOST,
-      info: {},
+      info: {
+        per: {},
+        username: null,
+        avatar_url: null,
+        id: null,
+        win: 0,
+        lose: 0,
+        is_online: true,
+      },
       users: [],
       messages: {},
-      channel_id: "",
+      channel_id: "1",
       message: "",
       online: {},
       offline: {},
@@ -42,7 +48,6 @@ export default {
   },
   created() {
     console.log("Main Created");
-    user.getInfo().then((res) => (this.info = res.data));
     if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
     }
@@ -52,6 +57,7 @@ export default {
       console.log("Connected");
       this.$options.sockets.onopen = () => {
         console.log("On open");
+        this.$socket.send(JSON.stringify({ GetUserInfo: {} }));
         this.$socket.send(JSON.stringify("GetUsers"));
         this.$socket.send(JSON.stringify({ GetPers: {} }));
       };
@@ -64,7 +70,9 @@ export default {
         message_id: "",
       };
       let data = JSON.parse(m.data);
-      if (data.GetUsersRes) {
+      if (data.GetUserInfoRes) {
+        this.info = { ...this.info, ...data.GetUserInfoRes };
+      } else if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
         this.users
           .filter((user) => user.is_online)
@@ -80,6 +88,9 @@ export default {
         data.UserOnline.is_online = true;
         this.online[data.UserOnline.id] = data.UserOnline;
         delete this.offline[data.UserOnline.id];
+        if (data.user.filter((u) => u.id === data.UserOnline.id).length === 0) {
+          this.users = [...this.users, data.UserOnline];
+        }
       } else if (data.UserOffline) {
         data.UserOffline.is_online = false;
         this.offline[data.UserOffline.id] = data.UserOffline;
@@ -114,7 +125,7 @@ export default {
         messageData.message_id = data.SendRes.message_id;
         this.messages[data.SendRes.channel_id] = [
           ...this.messages[data.SendRes.channel_id],
-          ...[messageData],
+          messageData,
         ];
       } else if (data.BroadCastMsg) {
         this.messages[data.BroadCastMsg.channel_id] = [
@@ -126,7 +137,7 @@ export default {
   },
   methods: {
     onSendMsg(m) {
-      this.message = m.split(/<@(\d+)>/g);
+      this.message = m.split(/(<[@#]\d+>)/g);
     },
     getChannelId(channel_id) {
       this.channel_id = channel_id;
