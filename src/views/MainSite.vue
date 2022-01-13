@@ -129,7 +129,7 @@ export default {
         ];
       } else if (data.BroadCastMsg) {
         this.messages[data.BroadCastMsg.channel_id] = [
-          ...this.messages[data.BroadCastMsg.channel_id],
+          ...(this.messages[data.BroadCastMsg.channel_id] || []),
           ...[recv.receiveMessage(this.users, messageData, data.BroadCastMsg)],
         ];
       }

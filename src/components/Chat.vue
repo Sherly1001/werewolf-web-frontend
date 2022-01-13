@@ -62,12 +62,9 @@ export default {
     onSendMsg: Function,
   },
   data() {
-    const cids = { rules: "0", lobby: "1" };
-    const channel_id =
-      cids[this.$route.params.name] || this.$route.params.id || "0";
+    const cids = { rules: "0", lobby: "1", 0: "rules", 1: "lobby" };
     return {
       hasMore: true,
-      channel_id,
       cids,
       r_user: /<@(\d+)>/,
       r_channel: /<#(\d+)>/,
@@ -100,9 +97,9 @@ export default {
       let channel_id = this.per[id] ? id : personal_channel || "1";
 
       let to =
-        channel_id !== "1"
+        channel_id !== "1" && channel_id != "0"
           ? { name: "Game Room", params: { id: channel_id } }
-          : { name: "Chat", params: { name: "lobby" } };
+          : { name: "Chat", params: { name: this.cids[channel_id] } };
       this.$router.push(to);
     },
   },
@@ -115,6 +112,14 @@ export default {
     }, 0);
   },
   watch: {
+    per: {
+      handler: function (newVal) {
+        if (!newVal[this.channel_id]) {
+          this.$router.push({ name: "Chat", params: { name: "lobby" } });
+        }
+      },
+      deep: true,
+    },
     messages: {
       handler: function (newVal) {
         let msg = document.getElementById("messages");
@@ -131,8 +136,12 @@ export default {
     },
     $route(to) {
       const cid = this.cids[to.params.name] || to.params.id || "0";
-      this.channel_id = cid;
       this.emitChannelId(cid);
+    },
+  },
+  computed: {
+    channel_id: function () {
+      return this.cids[this.$route.params.name] || this.$route.params.id || "0";
     },
   },
 };
