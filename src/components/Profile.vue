@@ -90,7 +90,7 @@ img {
   border-top-right-radius: 8px;
 }
 .name-and-id {
-  margin-top: 32px;
+  margin-top: 64px;
   text-align: left;
   margin-left: 10px;
   margin-right: 10px;
