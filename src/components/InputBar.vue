@@ -10,12 +10,12 @@
         id="chat-input"
         contenteditable="true"
         @keydown="sendMessage"
-        :placeholder="'Message #' + channel_name"
-      >
-        <span class="banned" v-if="!allow_check"
-          >You don't have permission to chat in this channel</span
-        >
-      </div>
+        :placeholder="
+          allow_check
+            ? 'Message #' + channel_name
+            : 'You don\'t have permission to chat in this channel'
+        "
+      ></div>
     </div>
   </div>
 </template>
@@ -24,7 +24,7 @@
 export default {
   props: {
     emitSend: Function,
-    info: Object,
+    per: Object,
     channel_id: String,
   },
   data() {
@@ -40,7 +40,7 @@ export default {
         if (e.key == "Enter" && !e.shiftKey) {
           e.preventDefault();
           let chatInput = document.getElementById("chat-input");
-          let text = chatInput.innerText.replace(/\n/g, "");
+          let text = chatInput.innerText;
           if (text) {
             this.$socket.send(
               JSON.stringify({
@@ -56,16 +56,19 @@ export default {
   },
   computed: {
     allow_check: function () {
-      return this.info.per
-        ? this.info.per[this.channel_id]
-          ? this.info.per[this.channel_id].sendable
+      console.log(this.channel_id);
+      let rs = this.per
+        ? this.per[this.channel_id]
+          ? this.per[this.channel_id].sendable
           : false
         : false;
+      console.log(rs);
+      return rs;
     },
     channel_name: function () {
-      return this.info.per
-        ? this.info.per[this.channel_id]
-          ? this.info.per[this.channel_id].channel_name
+      return this.per
+        ? this.per[this.channel_id]
+          ? this.per[this.channel_id].channel_name
           : "personal channel"
         : "personal channel";
     },

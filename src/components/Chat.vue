@@ -23,7 +23,7 @@
               >{{
                 (() => {
                   let id = word.match(r_channel)[1];
-                  let channel = info.per[id];
+                  let channel = per[id];
                   return channel ? channel.channel_name : "personal channel";
                 })()
               }}</DiscordMention
@@ -34,6 +34,8 @@
       </DiscordMessages>
     </div>
   </div>
+
+  <InputBar :emitSend="onSendMsg" :per="per" :channel_id="channel_id" />
 </template>
 
 <script>
@@ -43,12 +45,21 @@ import {
   DiscordMention,
 } from "@discord-message-components/vue";
 import NavBar from "./NavBar.vue";
+import InputBar from "./InputBar.vue";
 export default {
+  components: {
+    DiscordMessage,
+    DiscordMessages,
+    DiscordMention,
+    NavBar,
+    InputBar,
+  },
   props: {
-    info: Object,
+    per: Object,
     messages: Array,
     emitChannelId: Function,
     users: Object,
+    onSendMsg: Function,
   },
   data() {
     const cids = { rules: "0", lobby: "1" };
@@ -61,12 +72,6 @@ export default {
       r_user: /<@(\d+)>/,
       r_channel: /<#(\d+)>/,
     };
-  },
-  components: {
-    DiscordMessage,
-    DiscordMessages,
-    DiscordMention,
-    NavBar,
   },
   methods: {
     loadMoreMess() {
@@ -87,12 +92,12 @@ export default {
       }
     },
     to_channel(match) {
-      let personal_channel = Object.keys(this.info.per).filter(
-        (cid) => this.info.per[cid].channel_name === "personal channel"
+      let personal_channel = Object.keys(this.per).filter(
+        (cid) => this.per[cid].channel_name === "personal channel"
       )[0];
 
       let id = match[1] || "1";
-      let channel_id = this.info.per[id] ? id : personal_channel || "1";
+      let channel_id = this.per[id] ? id : personal_channel || "1";
 
       let to =
         channel_id !== "1"
