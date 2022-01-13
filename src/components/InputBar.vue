@@ -56,14 +56,11 @@ export default {
   },
   computed: {
     allow_check: function () {
-      console.log(this.channel_id);
-      let rs = this.per
+      return this.per
         ? this.per[this.channel_id]
           ? this.per[this.channel_id].sendable
           : false
         : false;
-      console.log(rs);
-      return rs;
     },
     channel_name: function () {
       return this.per
