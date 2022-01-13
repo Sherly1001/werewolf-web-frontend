@@ -96,14 +96,19 @@ export default {
         this.offline[data.UserOffline.id] = data.UserOffline;
         delete this.online[data.UserOffline.id];
       } else if (data.GetMsgRes) {
-        this.messages[data.GetMsgRes.channel_id] = [
-          ...recv.getAllMessages(
-            this.users,
-            messageData,
-            data.GetMsgRes.messages
-          ),
-          ...(this.messages[data.GetMsgRes.channel_id] || []),
-        ];
+        let hasMore = true;
+        if (data.GetMsgRes.messages.length < 20) {
+          console.log("no more:", data.GetMsgRes.channel_id);
+          hasMore = false;
+        }
+        let old_msgs = this.messages[data.GetMsgRes.channel_id] || [];
+        let old_ids = old_msgs.map((m) => m.message_id);
+        let new_msgs = recv
+          .getAllMessages(this.users, messageData, data.GetMsgRes.messages)
+          .filter((m) => !old_ids.includes(m.message_id));
+        new_msgs = [...new_msgs, ...old_msgs];
+        new_msgs.hasMore = hasMore;
+        this.messages[data.GetMsgRes.channel_id] = new_msgs;
       } else if (data.GetPersRes) {
         this.info.per = data.GetPersRes;
         for (const key in this.info.per) {
@@ -128,10 +133,14 @@ export default {
           messageData,
         ];
       } else if (data.BroadCastMsg) {
-        this.messages[data.BroadCastMsg.channel_id] = [
-          ...(this.messages[data.BroadCastMsg.channel_id] || []),
-          ...[recv.receiveMessage(this.users, messageData, data.BroadCastMsg)],
+        let old_msgs = this.messages[data.BroadCastMsg.channel_id] || [];
+        let new_msgs = [
+          ...old_msgs,
+          recv.receiveMessage(this.users, messageData, data.BroadCastMsg),
         ];
+        new_msgs.hasMore =
+          old_msgs.hasMore === undefined ? true : old_msgs.hasMore;
+        this.messages[data.BroadCastMsg.channel_id] = new_msgs;
       }
     };
   },
