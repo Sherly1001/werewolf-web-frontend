@@ -7,18 +7,26 @@
     <div class="messages" id="messages" v-on:scroll.passive="loadMoreMess">
       <DiscordMessages v-for="mess in messages" :key="mess.message_id">
         <DiscordMessage :author="mess.username" :avatar="mess.avatar_url">
-          <template v-for="(yay, index) in mess.message" :key="index">
-            <span v-show="yay.match(regex) == null"> {{ yay }} </span>
-            <DiscordMention :highlight="true" v-show="yay.match(regex) != null">
-              {{
+          <template v-for="(word, index) in mess.message" :key="index">
+            <DiscordMention :highlight="true" v-if="word.match(r_user) != null">{{
+              (() => {
+                let id = word.match(r_user)[1];
+                let user = users.filter((u) => u.id == id)[0];
+                return user ? user.username : "deleted user";
+              })()
+            }}</DiscordMention>
+            <DiscordMention
+              :highlight="true"
+              v-else-if="word.match(r_channel) != null"
+              >{{
                 (() => {
-                  let user = users.filter((i) => {
-                    if (i.id == yay) return i.username;
-                  })[0];
-                  return user ? user.username : yay;
+                  let id = word.match(r_channel)[1];
+                  let user = users.filter((u) => u.id == id)[0];
+                  return user ? user.username : "personal channel";
                 })()
-              }}
-            </DiscordMention>
+              }}</DiscordMention
+            >
+            <span v-else>{{ word }}</span>
           </template>
         </DiscordMessage>
       </DiscordMessages>
@@ -48,7 +56,8 @@ export default {
       hasMore: true,
       channel_id,
       cids,
-      regex: /(\d{19})/g,
+      r_user: /<@(\d+)>/,
+      r_channel: /<#(\d+)>/,
     };
   },
   components: {

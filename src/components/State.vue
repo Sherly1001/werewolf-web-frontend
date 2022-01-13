@@ -4,7 +4,7 @@
     class="user"
     v-for="user in users"
     :key="user.username"
-    @click="showInfo"
+    @click="showInfo(user.id)"
   >
     <div class="img-container">
       <img :src="user.avatar_url" alt="" />
@@ -14,10 +14,14 @@
     <div class="user-info">
       <p class="username">{{ user.username }}</p>
     </div>
-      <!-- <Profile :userInfo="user"/> -->
-    
+    <Profile
+      :userInfo="user"
+      :id="user.id"
+      class="profile"
+      style="display: none"
+    />
   </div>
-      <Profile :userInfo="users[0]"/>
+  <!-- <Profile :userInfo="users[0]"/> -->
 </template>
 
 <script>
@@ -33,8 +37,35 @@ export default {
   data() {
     return {
       tmp: {},
-    }
-  }
+    };
+  },
+  methods: {
+    showInfo(id) {
+      let profileArr = document.getElementsByClassName("profile");
+      for (let i = 0; i < profileArr.length; ++i) {
+        if (profileArr[i].style.display == "block") {
+          profileArr[i].style.display = "none";
+        }
+      }
+      let user_id = document.getElementById(id);
+      if (user_id.style.display == "none") {
+        user_id.style.display = "block";
+      } else { user_id.style.display = "none";  console.log("hidden")}
+      console.log(user_id.style.display);
+    },
+    findPos(obj) {
+      let curleft = 0,
+        curtop = 0;
+
+      if (obj.offsetParent)
+        do {
+          curleft += obj.offsetLeft;
+          curtop += obj.offsetTop;
+        } while ((obj = obj.offsetParent));
+
+      return [curleft, curtop];
+    },
+  },
 };
 </script>
 
