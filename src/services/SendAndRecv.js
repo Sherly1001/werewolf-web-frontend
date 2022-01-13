@@ -16,7 +16,7 @@ function getAllMessages(users, messageData, data) {
     messageData.avatar_url = userSend[0].avatar_url;
     messageData.message = data[i].message.split(/(<[@#]\d+>)/g);
     messageData.message_id = data[i].message_id;
-    store.unshift({...messageData});
+    store.unshift({ ...messageData });
   }
   return store;
 }

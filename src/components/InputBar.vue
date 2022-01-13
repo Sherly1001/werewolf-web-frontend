@@ -10,7 +10,7 @@
         id="chat-input"
         contenteditable="true"
         @keydown="sendMessage"
-        :placeholder="'Message @' + channel_name"
+        :placeholder="'Message #' + channel_name"
       >
         <span class="banned" v-if="!allow_check"
           >You don't have permission to chat in this channel</span
@@ -55,19 +55,19 @@ export default {
     },
   },
   computed: {
-    allow_check: function() {
+    allow_check: function () {
       return this.info.per
         ? this.info.per[this.channel_id]
           ? this.info.per[this.channel_id].sendable
           : false
         : false;
     },
-    channel_name: function() {
+    channel_name: function () {
       return this.info.per
         ? this.info.per[this.channel_id]
           ? this.info.per[this.channel_id].channel_name
-          : ""
-        : "";
+          : "personal channel"
+        : "personal channel";
     },
   },
 };

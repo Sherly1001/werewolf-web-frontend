@@ -21,7 +21,7 @@
       style="display: none"
     />
   </div>
-  <!-- <Profile :userInfo="users[0]"/> -->
+  <Profile :userInfo="users[0] || {}" />
 </template>
 
 <script>
@@ -50,7 +50,10 @@ export default {
       let user_id = document.getElementById(id);
       if (user_id.style.display == "none") {
         user_id.style.display = "block";
-      } else { user_id.style.display = "none";  console.log("hidden")}
+      } else {
+        user_id.style.display = "none";
+        console.log("hidden");
+      }
       console.log(user_id.style.display);
     },
     findPos(obj) {

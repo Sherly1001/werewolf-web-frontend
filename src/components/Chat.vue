@@ -16,13 +16,15 @@
               })()
             }}</DiscordMention>
             <DiscordMention
-              :highlight="true"
               v-else-if="word.match(r_channel) != null"
+              type="channel"
+              :highlight="true"
+              @click="to_channel(word.match(r_channel))"
               >{{
                 (() => {
                   let id = word.match(r_channel)[1];
-                  let user = users.filter((u) => u.id == id)[0];
-                  return user ? user.username : "personal channel";
+                  let channel = info.per[id];
+                  return channel ? channel.channel_name : "personal channel";
                 })()
               }}</DiscordMention
             >
@@ -84,6 +86,20 @@ export default {
         }
       }
     },
+    to_channel(match) {
+      let personal_channel = Object.keys(this.info.per).filter(
+        (cid) => this.info.per[cid].channel_name === "personal channel"
+      )[0];
+
+      let id = match[1] || "1";
+      let channel_id = this.info.per[id] ? id : personal_channel || "1";
+
+      let to =
+        channel_id !== "1"
+          ? { name: "Game Room", params: { id: channel_id } }
+          : { name: "Chat", params: { name: "lobby" } };
+      this.$router.push(to);
+    },
   },
   mounted() {
     console.log("Chat Mounted");
@@ -95,7 +111,7 @@ export default {
   },
   watch: {
     messages: {
-      handler: function(newVal) {
+      handler: function (newVal) {
         let msg = document.getElementById("messages");
         if (
           newVal &&
@@ -174,5 +190,8 @@ export default {
   left: 0;
   bottom: 0;
   width: 2px;
+}
+.discord-mention {
+  cursor: pointer;
 }
 </style>
