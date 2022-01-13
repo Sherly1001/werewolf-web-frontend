@@ -53,7 +53,7 @@ export default {
         .then((token) => {
           if (token) {
             this.$cookies.set("token", token, 60 * 60 * 24 * 5);
-            this.$router.push({ name: "Rules" });
+            this.$router.push({ name: "Chat", params: { name: "rules" } });
             this.message = "";
           }
         })

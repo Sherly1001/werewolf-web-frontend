@@ -11,8 +11,8 @@ import VueNativeSock from "vue-native-websocket-vue3";
 import "@discord-message-components/vue/dist/style.css";
 import user from "./services/user.js";
 import dotenv from "dotenv";
-dotenv.config();
 
+dotenv.config();
 const token = user.getCookie("token");
 
 library.add(fas);
@@ -26,7 +26,7 @@ createApp(App)
     `wss://werewolf-web-services.herokuapp.com/ws?token=${token}`,
     {
       reconnection: true,
-      reconnectionAttempts: 100, 
+      reconnectionAttempts: 100,
       reconnectionDelay: 300,
       connectManually: true,
     }

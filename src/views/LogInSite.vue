@@ -1,7 +1,7 @@
 <template>
   <div class="login-site">
-    <SignUpForm v-if="signup"/>
-    <LoginForm v-if="!signup"/>
+    <SignUpForm v-if="signup" />
+    <LoginForm v-if="!signup" />
   </div>
 </template>
 
@@ -10,7 +10,7 @@ import SignUpForm from "../components/SignUpForm.vue";
 import LoginForm from "../components/LogInForm.vue";
 export default {
   props: {
-    signup: Boolean
+    signup: Boolean,
   },
   components: {
     LoginForm,
@@ -18,7 +18,7 @@ export default {
   },
   mounted() {
     if (this.$cookies.isKey("token")) {
-      this.$router.push({ name: "Rules" });
+      this.$router.push({ name: "Chat", params: { name: "rules" } });
     }
   },
 };

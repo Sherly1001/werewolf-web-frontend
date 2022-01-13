@@ -1,5 +1,6 @@
 const api_host = process.env.VUE_APP_API_HOST;
 
+
 async function getRandomCat() {
   return await fetch("https://aws.random.cat/meow").then((res) => res.json());
 }

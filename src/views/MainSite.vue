@@ -1,9 +1,14 @@
 <template>
   <div class="main-site">
-    <SideBar :info="info" />
+    <SideBar :info="info" :per="info.per" />
     <div class="replace-area">
-      <router-view :info="info" :messagesRecv="messages" />
-      <InputBar :emitSend="onSendMsg" />
+      <router-view
+        :per="info.per"
+        :messages="messages[channel_id]"
+        :emitChannelId="getChannelId"
+        :users="users"
+        :onSendMsg="onSendMsg"
+      />
     </div>
     <Member :online="Object.values(online)" :offline="Object.values(offline)" />
   </div>
@@ -13,20 +18,27 @@
 import SideBar from "../components/SideBar.vue";
 import Member from "../components/Member.vue";
 import user from "../services/user.js";
-import InputBar from "../components/InputBar.vue";
 import recv from "../services/SendAndRecv.js";
 export default {
   components: {
     SideBar,
     Member,
-    InputBar,
   },
   data() {
     return {
       token: user.getCookie("token"),
-      info: {},
+      ws_url: process.env.VUE_APP_WS_HOST,
+      info: {
+        per: {},
+        username: null,
+        avatar_url: null,
+        id: null,
+        win: 0,
+        lose: 0,
+        is_online: true,
+      },
       users: [],
-      messages: [],
+      messages: {},
       channel_id: "1",
       message: "",
       online: {},
@@ -34,38 +46,33 @@ export default {
       position: 0,
     };
   },
-  mounted() {
-    user.getInfo().then((res) => (this.info = res.data));
-    console.log("Main Mounted");
+  created() {
+    console.log("Main Created");
     if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
     }
     if (this.token) {
       console.log("Connect");
-      this.$connect(
-        `wss://werewolf-web-services.herokuapp.com/ws?token=${this.token}`
-      );
+      this.$connect(`${this.ws_url}/ws?token=${this.token}`);
       console.log("Connected");
       this.$options.sockets.onopen = () => {
         console.log("On open");
+        this.$socket.send(JSON.stringify({ GetUserInfo: {} }));
         this.$socket.send(JSON.stringify("GetUsers"));
-        this.$socket.send(
-          JSON.stringify({
-            GetMsg: { channel_id: this.channel_id, offset: 0, limit: 20 },
-          })
-        );
+        this.$socket.send(JSON.stringify({ GetPers: {} }));
       };
     }
     this.$options.sockets.onmessage = (m) => {
       let messageData = {
         message: this.message,
-        channel_id: this.channel_id,
         username: this.info.username,
         avatar_url: this.info.avatar_url,
         message_id: "",
       };
       let data = JSON.parse(m.data);
-      if (data.GetUsersRes) {
+      if (data.GetUserInfoRes) {
+        this.info = { ...this.info, ...data.GetUserInfoRes };
+      } else if (data.GetUsersRes) {
         this.users = data.GetUsersRes;
         this.users
           .filter((user) => user.is_online)
@@ -77,37 +84,72 @@ export default {
           .forEach((u) => {
             this.offline[u.id] = u;
           });
-      }
-      if (data.UserOnline) {
+      } else if (data.UserOnline) {
         data.UserOnline.is_online = true;
         this.online[data.UserOnline.id] = data.UserOnline;
         delete this.offline[data.UserOnline.id];
-      }
-      if (data.UserOffline) {
+        if (data.user.filter((u) => u.id === data.UserOnline.id).length === 0) {
+          this.users = [...this.users, data.UserOnline];
+        }
+      } else if (data.UserOffline) {
         data.UserOffline.is_online = false;
         this.offline[data.UserOffline.id] = data.UserOffline;
         delete this.online[data.UserOffline.id];
-      }
-      if (data.GetMsgRes) {
-        this.messages = recv.getAllMessages(
-          this.users,
-          messageData,
-          data.GetMsgRes.messages
-        );
-      }
-      if (data.SendRes) {
+      } else if (data.GetMsgRes) {
+        let hasMore = true;
+        if (data.GetMsgRes.messages.length < 20) {
+          console.log("no more:", data.GetMsgRes.channel_id);
+          hasMore = false;
+        }
+        let old_msgs = this.messages[data.GetMsgRes.channel_id] || [];
+        let old_ids = old_msgs.map((m) => m.message_id);
+        let new_msgs = recv
+          .getAllMessages(this.users, messageData, data.GetMsgRes.messages)
+          .filter((m) => !old_ids.includes(m.message_id));
+        new_msgs = [...new_msgs, ...old_msgs];
+        new_msgs.hasMore = hasMore;
+        this.messages[data.GetMsgRes.channel_id] = new_msgs;
+      } else if (data.GetPersRes) {
+        this.info.per = data.GetPersRes;
+        for (const key in this.info.per) {
+          if (!this.messages[key])
+            this.$socket.send(
+              JSON.stringify({
+                GetMsg: { channel_id: key, offset: 0, limit: 20 },
+              })
+            );
+        }
+        for (let key in this.messages) {
+          if (!data.GetPersRes[key]) {
+            let tmp = { ...this.messages };
+            delete tmp[key];
+            this.messages = tmp;
+          }
+        }
+      } else if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
-        this.messages.push(messageData);
+        this.messages[data.SendRes.channel_id] = [
+          ...this.messages[data.SendRes.channel_id],
+          messageData,
+        ];
       } else if (data.BroadCastMsg) {
-        this.messages.push(
-          recv.receiveMessage(this.users, messageData, data.BroadCastMsg)
-        );
+        let old_msgs = this.messages[data.BroadCastMsg.channel_id] || [];
+        let new_msgs = [
+          ...old_msgs,
+          recv.receiveMessage(this.users, messageData, data.BroadCastMsg),
+        ];
+        new_msgs.hasMore =
+          old_msgs.hasMore === undefined ? true : old_msgs.hasMore;
+        this.messages[data.BroadCastMsg.channel_id] = new_msgs;
       }
     };
   },
   methods: {
     onSendMsg(m) {
-      this.message = m;
+      this.message = m.split(/(<[@#]\d+>)/g);
+    },
+    getChannelId(channel_id) {
+      this.channel_id = channel_id;
     },
   },
 };

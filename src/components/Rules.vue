@@ -11,17 +11,25 @@
         understand the game
       </p>
     </div>
-    <InputBar />
   </div>
 </template>
 
 <script>
 import Navbar from "./NavBar.vue";
-import InputBar from "./InputBar.vue";
 export default {
+  props: {
+    emitChannelId: Function,
+  },
   components: {
     Navbar,
-    InputBar,
+  },
+  data() {
+    return {
+      channel_id: "0",
+    };
+  },
+  mounted() {
+    this.emitChannelId(this.channel_id);
   },
 };
 </script>

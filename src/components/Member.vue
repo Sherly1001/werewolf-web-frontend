@@ -52,7 +52,7 @@ export default {
   border-radius: 10px;
 }
 .member {
-  width: 15.5rem;
+  min-width: 15.5rem;
   position: relative;
   background: #2f3136;
   color: #8e9297;

@@ -2,15 +2,14 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import MainSite from "../views/MainSite.vue";
 import LogInSite from "../views/LogInSite.vue";
 import Chat from "../components/Chat.vue";
-import Rules from "../components/Rules.vue";
 const routes = [
   {
     path: "/",
     name: "MainSite",
     component: MainSite,
     children: [
-      { path: "rooms/lobby", name: "Chat", component: Chat },
-      { path: "rooms/rules", name: "Rules", component: Rules },
+      { path: "rooms/:name", name: "Chat", component: Chat },
+      { path: "games/:id", name: "Game Room", component: Chat },
     ],
   },
   {

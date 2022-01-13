@@ -1,6 +1,11 @@
 <template>
   <div class="title">{{ title }} ー {{ users.length }}</div>
-  <div class="user" v-for="user in users" :key="user.username">
+  <div
+    class="user"
+    v-for="user in users"
+    :key="user.username"
+    @click="showInfo(user.id)"
+  >
     <div class="img-container">
       <img :src="user.avatar_url" alt="" />
       <div class="status-circle-online" v-if="user.is_online"></div>
@@ -9,14 +14,41 @@
     <div class="user-info">
       <p class="username">{{ user.username }}</p>
     </div>
+    <Profile :userInfo="user || {}" :id="user.id" class="profile" />
   </div>
+  <!-- <Profile :userInfo="users[0] || {}" /> -->
 </template>
 
 <script>
+import Profile from "./Profile.vue";
 export default {
+  components: {
+    Profile,
+  },
   props: {
     title: String,
     users: Array,
+  },
+  data() {
+    return {
+      tmp: {},
+    };
+  },
+  methods: {
+    showInfo(id) {
+      let profileArr = document.getElementsByClassName("profile");
+      for (let i = 0; i < profileArr.length; ++i) {
+        if (profileArr[i].style.display == "block" && profileArr[i].id != id) {
+          profileArr[i].style.display = "none";
+        }
+      }
+      let user_id = document.getElementById(id);
+      if (user_id.style.display == "none" || user_id.style.display == "") {
+        user_id.style.display = "block";
+      } else {
+        user_id.style.display = "none";
+      }
+    },
   },
 };
 </script>
@@ -31,6 +63,13 @@ img {
   display: flex;
   margin-top: 0.9rem;
   margin-left: 1rem;
+  position: relative;
+  cursor: pointer;
+  border-radius: 4px;
+  padding-top: 5px;
+}
+.user:hover {
+  background: rgba(79, 84, 92, 0.16);
 }
 .img-container {
   width: 32px;
@@ -71,5 +110,11 @@ img {
   font-weight: 800;
   align-items: center;
   text-align: center;
+}
+.profile-contain {
+  position: relative;
+}
+.profile {
+  display: none;
 }
 </style>
