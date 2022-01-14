@@ -57,6 +57,9 @@ export default {
   props: {
     per: Object,
     messages: Array,
+    hasMore: Object,
+    onLoadMore: Function,
+    onScroll: Function,
     emitChannelId: Function,
     users: Object,
     onSendMsg: Function,
@@ -65,6 +68,7 @@ export default {
     const cids = { rules: "0", lobby: "1", 0: "rules", 1: "lobby" };
     return {
       cids,
+      firstLoad: [],
       r_user: /<@(\d+)>/,
       r_channel: /<#(\d+)>/,
     };
@@ -73,18 +77,17 @@ export default {
     loadMoreMess() {
       let offset = this.messages.length;
       let msg = document.getElementById("messages");
-      if (this.hasMore && msg.scrollTop <= 100) {
+      if (
+        this.hasMore.hasMore &&
+        this.hasMore.lastFetchMoreDone &&
+        msg.scrollTop <= 100
+      ) {
         console.log("get more", this.channel_id);
-        this.$socket.send(
-          JSON.stringify({
-            GetMsg: {
-              channel_id: this.channel_id,
-              offset: offset,
-              limit: 20,
-            },
-          })
-        );
+        this.onLoadMore(this.channel_id, offset);
       }
+      setTimeout(() => {
+        this.onScroll(this.channel_id, msg.scrollTop, msg.scrollHeight);
+      }, 0);
     },
     to_channel(match) {
       let personal_channel = Object.keys(this.per).filter(
@@ -104,10 +107,6 @@ export default {
   mounted() {
     console.log("Chat Mounted");
     this.emitChannelId(this.channel_id);
-    let msg = document.getElementById("messages");
-    setTimeout(() => {
-      msg.scrollTop = msg.scrollHeight;
-    }, 0);
   },
   watch: {
     per: {
@@ -121,14 +120,25 @@ export default {
     messages: {
       handler: function (newVal) {
         let msg = document.getElementById("messages");
-        if (
-          newVal &&
-          msg.scrollHeight - msg.scrollTop <= msg.clientHeight + 100
-        ) {
-          setTimeout(() => {
+        setTimeout(() => {
+          let outClient =
+            this.hasMore.scrollTop !== undefined
+              ? this.hasMore.scrollHeight -
+                this.hasMore.scrollTop -
+                msg.clientHeight
+              : msg.scrollHeight - msg.scrollTop - msg.clientHeight;
+          console.log("out client:", outClient, msg.clientHeight);
+          if (newVal.length != 0 && !this.firstLoad[this.channel_id]) {
             msg.scrollTop = msg.scrollHeight;
-          }, 0);
-        }
+            this.firstLoad[this.channel_id] = true;
+          } else if (outClient <= 200) {
+            console.log("go down:", outClient);
+            msg.scrollTop = msg.scrollHeight;
+          } else {
+            msg.scrollTop = this.hasMore.scrollTop;
+          }
+          this.onScroll(this.channel_id, msg.scrollTop, msg.scrollHeight);
+        }, 0);
       },
       deep: true,
     },
@@ -140,9 +150,6 @@ export default {
   computed: {
     channel_id: function () {
       return this.cids[this.$route.params.name] || this.$route.params.id || "0";
-    },
-    hasMore: function () {
-      return this.messages.hasMore;
     },
   },
 };
