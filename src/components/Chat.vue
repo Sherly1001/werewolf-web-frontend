@@ -77,6 +77,7 @@ export default {
     loadMoreMess() {
       let offset = this.messages.length;
       let msg = document.getElementById("messages");
+      // console.log(this.hasMore.lastFetchMoreDone);
       if (
         this.hasMore.hasMore &&
         this.hasMore.lastFetchMoreDone &&
@@ -84,10 +85,10 @@ export default {
       ) {
         console.log("get more", this.channel_id);
         this.onLoadMore(this.channel_id, offset);
+      } else if (msg.scrollTop < 10) {
+        msg.scrollTop = 10;
       }
-      setTimeout(() => {
-        this.onScroll(this.channel_id, msg.scrollTop, msg.scrollHeight);
-      }, 0);
+      this.onScroll(this.channel_id, msg.scrollTop, msg.scrollHeight);
     },
     to_channel(match) {
       let personal_channel = Object.keys(this.per).filter(
@@ -118,7 +119,7 @@ export default {
       deep: true,
     },
     messages: {
-      handler: function (newVal) {
+      handler: function (newVal, oldVal) {
         let msg = document.getElementById("messages");
         setTimeout(() => {
           let outClient =
@@ -127,14 +128,12 @@ export default {
                 this.hasMore.scrollTop -
                 msg.clientHeight
               : msg.scrollHeight - msg.scrollTop - msg.clientHeight;
-          console.log("out client:", outClient, msg.clientHeight);
           if (newVal.length != 0 && !this.firstLoad[this.channel_id]) {
             msg.scrollTop = msg.scrollHeight;
             this.firstLoad[this.channel_id] = true;
           } else if (outClient <= 200) {
-            console.log("go down:", outClient);
             msg.scrollTop = msg.scrollHeight;
-          } else {
+          } else if (newVal[newVal.length - 1] != oldVal[oldVal.length - 1]) {
             msg.scrollTop = this.hasMore.scrollTop;
           }
           this.onScroll(this.channel_id, msg.scrollTop, msg.scrollHeight);
