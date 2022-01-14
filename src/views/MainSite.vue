@@ -4,7 +4,10 @@
     <div class="replace-area">
       <router-view
         :per="info.per"
-        :messages="messages[channel_id]"
+        :messages="messages[channel_id] || []"
+        :hasMore="hasMore[channel_id] || {}"
+        :onLoadMore="onLoadMore"
+        :onScroll="onScroll"
         :emitChannelId="getChannelId"
         :users="users"
         :onSendMsg="onSendMsg"
@@ -39,6 +42,7 @@ export default {
       },
       users: [],
       messages: {},
+      hasMore: {},
       channel_id: "1",
       message: "",
       online: {},
@@ -103,14 +107,26 @@ export default {
           console.log("no more:", data.GetMsgRes.channel_id);
           hasMore = false;
         }
+        this.hasMore = Object.assign({}, this.hasMore, {
+          [data.GetMsgRes.channel_id]: Object.assign(
+            {},
+            this.hasMore[data.GetMsgRes.channel_id],
+            {
+              hasMore,
+              lastFetchMoreDone: true,
+            }
+          ),
+        });
         let old_msgs = this.messages[data.GetMsgRes.channel_id] || [];
         let old_ids = old_msgs.map((m) => m.message_id);
         let new_msgs = recv
           .getAllMessages(this.users, messageData, data.GetMsgRes.messages)
           .filter((m) => !old_ids.includes(m.message_id));
         new_msgs = [...new_msgs, ...old_msgs];
-        new_msgs.hasMore = hasMore;
-        this.messages[data.GetMsgRes.channel_id] = new_msgs;
+        this.messages = {
+          ...this.messages,
+          [data.GetMsgRes.channel_id]: new_msgs,
+        };
       } else if (data.GetPersRes) {
         this.info.per = data.GetPersRes;
         for (const key in this.info.per) {
@@ -120,29 +136,45 @@ export default {
                 GetMsg: { channel_id: key, offset: 0, limit: 20 },
               })
             );
+          this.hasMore = Object.assign({}, this.hasMore, {
+            [key]: Object.assign({}, this.hasMore[key], {
+              hasMore: true,
+              lastFetchMoreDone: true,
+            }),
+          });
         }
         for (let key in this.messages) {
           if (!data.GetPersRes[key]) {
             let tmp = { ...this.messages };
+            let hasMore = { ...this.hasMore };
             delete tmp[key];
+            delete hasMore[key];
             this.messages = tmp;
+            this.hasMore = hasMore;
           }
         }
       } else if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
-        this.messages[data.SendRes.channel_id] = [
-          ...this.messages[data.SendRes.channel_id],
-          messageData,
-        ];
+        this.messages = {
+          ...this.messages,
+          [data.SendRes.channel_id]: [
+            ...this.messages[data.SendRes.channel_id],
+            messageData,
+          ],
+        };
       } else if (data.BroadCastMsg) {
         let old_msgs = this.messages[data.BroadCastMsg.channel_id] || [];
+        old_msgs = old_msgs.filter(
+          (m) => m.message_id != data.BroadCastMsg.message_id
+        );
         let new_msgs = [
           ...old_msgs,
           recv.receiveMessage(this.users, messageData, data.BroadCastMsg),
         ];
-        new_msgs.hasMore =
-          old_msgs.hasMore === undefined ? true : old_msgs.hasMore;
-        this.messages[data.BroadCastMsg.channel_id] = new_msgs;
+        this.messages = {
+          ...this.messages,
+          [data.BroadCastMsg.channel_id]: new_msgs,
+        };
       }
     };
   },
@@ -152,6 +184,30 @@ export default {
     },
     getChannelId(channel_id) {
       this.channel_id = channel_id;
+    },
+    onLoadMore(channel_id, offset) {
+      this.hasMore = Object.assign({}, this.hasMore, {
+        [channel_id]: Object.assign({}, this.hasMore[channel_id], {
+          lastFetchMoreDone: true,
+        }),
+      });
+      this.$socket.send(
+        JSON.stringify({
+          GetMsg: {
+            channel_id: this.channel_id,
+            offset: offset,
+            limit: 20,
+          },
+        })
+      );
+    },
+    onScroll(channel_id, scrollTop, scrollHeight) {
+      this.hasMore = Object.assign({}, this.hasMore, {
+        [channel_id]: Object.assign({}, this.hasMore[channel_id], {
+          scrollTop,
+          scrollHeight,
+        }),
+      });
     },
   },
 };
