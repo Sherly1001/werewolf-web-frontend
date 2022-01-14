@@ -175,6 +175,12 @@ export default {
           ...this.messages,
           [data.BroadCastMsg.channel_id]: new_msgs,
         };
+      } else if (data.Error) {
+        if (this.info.username == null) {
+          this.$cookies.remove("token");
+          this.$router.push({ name: "LogIn" });
+          this.$disconnect();
+        }
       }
     };
   },
