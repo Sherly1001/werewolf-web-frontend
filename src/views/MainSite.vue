@@ -123,10 +123,9 @@ export default {
           .getAllMessages(this.users, messageData, data.GetMsgRes.messages)
           .filter((m) => !old_ids.includes(m.message_id));
         new_msgs = [...new_msgs, ...old_msgs];
-        this.messages = {
-          ...this.messages,
+        this.messages = Object.assign({}, this.messages, {
           [data.GetMsgRes.channel_id]: new_msgs,
-        };
+        });
       } else if (data.GetPersRes) {
         this.info.per = data.GetPersRes;
         for (const key in this.info.per) {
@@ -155,13 +154,12 @@ export default {
         }
       } else if (data.SendRes) {
         messageData.message_id = data.SendRes.message_id;
-        this.messages = {
-          ...this.messages,
+        this.messages = Object.assign({}, this.messages, {
           [data.SendRes.channel_id]: [
-            ...this.messages[data.SendRes.channel_id],
+            ...(this.messages[data.SendRes.channel_id] || []),
             messageData,
           ],
-        };
+        });
       } else if (data.BroadCastMsg) {
         let old_msgs = this.messages[data.BroadCastMsg.channel_id] || [];
         old_msgs = old_msgs.filter(
@@ -171,10 +169,9 @@ export default {
           ...old_msgs,
           recv.receiveMessage(this.users, messageData, data.BroadCastMsg),
         ];
-        this.messages = {
-          ...this.messages,
+        this.messages = Object.assign({}, this.messages, {
           [data.BroadCastMsg.channel_id]: new_msgs,
-        };
+        });
       } else if (data.Error) {
         if (this.info.username == null) {
           this.$cookies.remove("token");
@@ -192,11 +189,6 @@ export default {
       this.channel_id = channel_id;
     },
     onLoadMore(channel_id, offset) {
-      this.hasMore = Object.assign({}, this.hasMore, {
-        [channel_id]: Object.assign({}, this.hasMore[channel_id], {
-          lastFetchMoreDone: true,
-        }),
-      });
       this.$socket.send(
         JSON.stringify({
           GetMsg: {
@@ -206,6 +198,11 @@ export default {
           },
         })
       );
+      this.hasMore = Object.assign({}, this.hasMore, {
+        [channel_id]: Object.assign({}, this.hasMore[channel_id], {
+          lastFetchMoreDone: false,
+        }),
+      });
     },
     onScroll(channel_id, scrollTop, scrollHeight) {
       this.hasMore = Object.assign({}, this.hasMore, {
