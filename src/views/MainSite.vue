@@ -55,6 +55,9 @@ export default {
     if (!this.$cookies.isKey("token")) {
       this.$router.push({ name: "LogIn" });
     }
+    if (this.$route.name == "MainSite") {
+      this.$router.push({ name: "Chat", params: { name: "rules" } });
+    }
     if (this.token) {
       console.log("Connect");
       this.$connect(`${this.ws_url}/ws?token=${this.token}`);
@@ -211,6 +214,13 @@ export default {
           scrollHeight,
         }),
       });
+    },
+  },
+  watch: {
+    $route(to) {
+      if (to.name == "MainSite") {
+        this.$router.push({ name: "Chat", params: { name: "rules" } });
+      }
     },
   },
 };
