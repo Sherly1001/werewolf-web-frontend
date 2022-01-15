@@ -26,7 +26,8 @@
             </button>
           </router-link>
         </div>
-        <div>
+        <div class="channel">
+          <div class="has-new" v-if="has_new_msg['1']" />
           <router-link :to="{ name: 'Chat', params: { name: 'lobby' } }">
             <button class="category-list" @click="active">
               <div class="hashtag">
@@ -48,11 +49,13 @@
         </div>
         <div class="channel_list">
           <div
-            v-for="channel_id in Object.keys(per)
+            v-for="channel_id in Object.keys(channels)
               .filter((cid) => !['0', '1'].includes(cid))
               .sort()"
             :key="channel_id"
+            class="channel"
           >
+            <div class="has-new" v-if="has_new_msg[channel_id]" />
             <router-link
               :to="{ name: 'Game Room', params: { id: channel_id } }"
             >
@@ -60,7 +63,7 @@
                 <div class="hashtag">
                   <fa :icon="['fas', 'hashtag']"></fa>
                 </div>
-                <p>{{ per[channel_id].channel_name }}</p>
+                <p>{{ channels[channel_id].channel_name }}</p>
               </button>
             </router-link>
           </div>
@@ -85,15 +88,43 @@
 
 <script>
 export default {
+  data() {
+    return {
+      has_new_msg: {},
+    };
+  },
   props: {
     info: Object,
-    per: Object,
+    channels: Object,
   },
   methods: {
     logout() {
       this.$cookies.remove("token");
       this.$router.push({ name: "LogIn" });
       this.$disconnect();
+    },
+  },
+  watch: {
+    channels(newVal, oldVal) {
+      let cur_cid =
+        this.$route.params.id ||
+        { lobby: "1", rules: "0" }[this.$route.params.name];
+      for (let cid in newVal) {
+        if (cid == "0") continue;
+        let new_msg = newVal[cid].last_msg;
+        let old_msg = (oldVal[cid] || {}).last_msg;
+        if (new_msg != old_msg && cid != cur_cid) {
+          this.has_new_msg[cid] = true;
+        }
+      }
+    },
+    $route({ params }) {
+      if (params.id) {
+        this.has_new_msg[params.id] = false;
+      } else if (params.name) {
+        let cids = { lobby: "1", rules: "0" };
+        this.has_new_msg[cids[params.name]] = false;
+      }
     },
   },
 };
@@ -235,5 +266,21 @@ img {
 .cog-btn:hover {
   transform: rotate(360deg);
   transition: 1s;
+}
+
+.channel {
+  position: relative;
+}
+
+.channel .has-new {
+  position: absolute;
+  top: 50%;
+  left: -.5em;
+  transform: translateY(-50%);
+  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
+  background: white;
+  height: 8px;
+  width: 5px;
 }
 </style>

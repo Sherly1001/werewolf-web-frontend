@@ -1,6 +1,6 @@
 <template>
   <div class="main-site">
-    <SideBar :info="info" :per="info.per" />
+    <SideBar :info="info" :channels="channels" />
     <div class="replace-area">
       <router-view
         :per="info.per"
@@ -221,6 +221,19 @@ export default {
       if (to.name == "MainSite") {
         this.$router.push({ name: "Chat", params: { name: "rules" } });
       }
+    },
+  },
+  computed: {
+    channels: function () {
+      let channels = {};
+      for (let cid in this.info.per) {
+        let msgs = this.messages[cid] || [];
+        let last_msg = msgs[msgs.length - 1];
+        channels[cid] = channels[cid] || {};
+        channels[cid].last_msg = last_msg ? last_msg.message_id : undefined;
+        channels[cid].channel_name = this.info.per[cid].channel_name;
+      }
+      return channels;
     },
   },
 };
